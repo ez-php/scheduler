@@ -1,0 +1,44 @@
+# git-cliff configuration for ez-php/scheduler
+[changelog]
+header = "# Changelog\n\nAll notable changes to `ez-php/scheduler` are documented here.\n\n"
+body = """
+{% if version %}\
+## [{{ version }}] — {{ timestamp | date(format="%Y-%m-%d") }}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group }}
+{% for commit in commits %}\
+- {{ commit.message | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
+{% endfor %}
+{% endfor %}
+{% else %}\
+## [Unreleased]
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group }}
+{% for commit in commits %}\
+- {{ commit.message | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
+{% endfor %}
+{% endfor %}
+{% endif %}\
+"""
+trim = true
+footer = ""
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+commit_parsers = [
+  { message = "^feat", group = "Features" },
+  { message = "^fix", group = "Bug Fixes" },
+  { message = "^perf", group = "Performance" },
+  { message = "^refactor", group = "Refactoring" },
+  { message = "^test", group = "Tests" },
+  { message = "^docs", group = "Documentation" },
+  { message = "^chore", skip = true },
+  { message = "^ci", skip = true },
+  { body = ".*\\[skip ci\\]", skip = true },
+]
+filter_commits = true
+tag_pattern = "v[0-9]*"
+topo_order = false
+sort_commits = "oldest"

@@ -1,7 +1,7 @@
 {
   "name": "ez-php/scheduler",
-  "version": "0.9.0",
-  "description": "TODO",
+  "version": "0.9.1",
+  "description": "Cron-based job scheduler with mutex-backed overlap prevention for ez-php applications",
   "type": "library",
   "license": "MIT",
   "authors": [

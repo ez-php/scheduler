@@ -3,4 +3,3 @@
 .env
 /var/
 /.php-cs-fixer.cache
-/storage
