@@ -342,23 +342,24 @@
         },
         {
             "name": "ez-php/docker",
-            "version": "0.9.1",
+            "version": "0.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/docker.git",
-                "reference": "e721a7e2f5e0e2276a520ef17be5b5904d536e04"
+                "reference": "809c7321c6056e24d42a20e412e0d8926c7402d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/docker/zipball/e721a7e2f5e0e2276a520ef17be5b5904d536e04",
-                "reference": "e721a7e2f5e0e2276a520ef17be5b5904d536e04",
+                "url": "https://api.github.com/repos/ez-php/docker/zipball/809c7321c6056e24d42a20e412e0d8926c7402d6",
+                "reference": "809c7321c6056e24d42a20e412e0d8926c7402d6",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.5"
             },
             "bin": [
-                "bin/docker-init"
+                "bin/docker-init",
+                "bin/update-docker"
             ],
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
@@ -368,9 +369,9 @@
             "description": "Docker base image source and scaffolding stubs for ez-php modules and projects",
             "support": {
                 "issues": "https://github.com/ez-php/docker/issues",
-                "source": "https://github.com/ez-php/docker/tree/v0.9.1"
+                "source": "https://github.com/ez-php/docker/tree/v0.9.2"
             },
-            "time": "2026-03-23T19:30:54+00:00"
+            "time": "2026-03-23T23:49:10+00:00"
         },
         {
             "name": "fidry/cpu-core-counter",
