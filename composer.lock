@@ -342,25 +342,25 @@
         },
         {
             "name": "ez-php/cache",
-            "version": "0.9.3",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/cache.git",
-                "reference": "b6865a7f115d3c8683ad6745bf2857b9ed425555"
+                "reference": "f1c56a8e84490518758ad683784f82466ac5cfda"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/cache/zipball/b6865a7f115d3c8683ad6745bf2857b9ed425555",
-                "reference": "b6865a7f115d3c8683ad6745bf2857b9ed425555",
+                "url": "https://api.github.com/repos/ez-php/cache/zipball/f1c56a8e84490518758ad683784f82466ac5cfda",
+                "reference": "f1c56a8e84490518758ad683784f82466ac5cfda",
                 "shasum": ""
             },
             "require": {
-                "ez-php/contracts": "0.*",
+                "ez-php/contracts": "*",
                 "php": "^8.5"
             },
             "require-dev": {
-                "ez-php/docker": "0.*",
-                "ez-php/testing-application": "0.*",
+                "ez-php/docker": "*",
+                "ez-php/testing-application": "*",
                 "friendsofphp/php-cs-fixer": "^3.94",
                 "phpstan/phpstan": "^2.1",
                 "phpstan/phpstan-deprecation-rules": "^2.0",
@@ -396,7 +396,7 @@
                 "issues": "https://github.com/ez-php/cache/issues",
                 "source": "https://github.com/ez-php/cache"
             },
-            "time": "2026-03-24T22:14:20+00:00"
+            "time": "2026-03-24T23:47:33+00:00"
         },
         {
             "name": "ez-php/console",
@@ -456,25 +456,26 @@
         },
         {
             "name": "ez-php/contracts",
-            "version": "0.9.3",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/contracts.git",
-                "reference": "350f70288b877a71a487ef8bee3ebd24ebe5f474"
+                "reference": "5fe838240db5d61cdbde5e91040b2728450bbc5f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/contracts/zipball/350f70288b877a71a487ef8bee3ebd24ebe5f474",
-                "reference": "350f70288b877a71a487ef8bee3ebd24ebe5f474",
+                "url": "https://api.github.com/repos/ez-php/contracts/zipball/5fe838240db5d61cdbde5e91040b2728450bbc5f",
+                "reference": "5fe838240db5d61cdbde5e91040b2728450bbc5f",
                 "shasum": ""
             },
             "require": {
                 "ext-pdo": "*",
-                "ez-php/http": "0.*",
+                "ez-php/http": "*",
                 "php": "^8.5"
             },
             "require-dev": {
-                "ez-php/docker": "0.*",
+                "ez-php/docker": "*",
+                "ez-php/testing-application": "*",
                 "friendsofphp/php-cs-fixer": "^3.94",
                 "phpstan/phpstan": "^2.1",
                 "phpstan/phpstan-deprecation-rules": "^2.0",
@@ -510,7 +511,7 @@
                 "issues": "https://github.com/ez-php/contracts/issues",
                 "source": "https://github.com/ez-php/contracts"
             },
-            "time": "2026-03-24T22:14:17+00:00"
+            "time": "2026-03-24T23:51:17+00:00"
         },
         {
             "name": "ez-php/docker",
@@ -603,31 +604,26 @@
         },
         {
             "name": "ez-php/framework",
-            "version": "0.9.3",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/framework.git",
-                "reference": "b8f2a572322d4dae7a65c00769d2431977064f2a"
+                "reference": "d6a540dd381ca432c05eb196aab2f8b3526a1e9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/framework/zipball/b8f2a572322d4dae7a65c00769d2431977064f2a",
-                "reference": "b8f2a572322d4dae7a65c00769d2431977064f2a",
+                "url": "https://api.github.com/repos/ez-php/framework/zipball/d6a540dd381ca432c05eb196aab2f8b3526a1e9c",
+                "reference": "d6a540dd381ca432c05eb196aab2f8b3526a1e9c",
                 "shasum": ""
             },
             "require": {
                 "ext-pdo": "*",
                 "ez-php/console": "0.*",
-                "ez-php/contracts": "0.*",
                 "ez-php/dotenv": "0.*",
                 "ez-php/http": "0.*",
-                "ez-php/i18n": "0.*",
-                "ez-php/validation": "0.*",
                 "php": "^8.5"
             },
             "require-dev": {
-                "ez-php/docker": "0.*",
-                "ez-php/testing-application": "0.*",
                 "friendsofphp/php-cs-fixer": "^3.94",
                 "phpstan/phpstan": "^2.1",
                 "phpstan/phpstan-deprecation-rules": "^2.0",
@@ -664,7 +660,7 @@
                 "issues": "https://github.com/ez-php/framework/issues",
                 "source": "https://github.com/ez-php/framework"
             },
-            "time": "2026-03-24T22:14:22+00:00"
+            "time": "2026-03-15T03:47:56+00:00"
         },
         {
             "name": "ez-php/http",
@@ -723,88 +719,28 @@
             "time": "2026-03-24T22:14:21+00:00"
         },
         {
-            "name": "ez-php/i18n",
-            "version": "0.9.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ez-php/i18n.git",
-                "reference": "3ebbc641f165d11e44f4d4c302350ca13486e8e5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/i18n/zipball/3ebbc641f165d11e44f4d4c302350ca13486e8e5",
-                "reference": "3ebbc641f165d11e44f4d4c302350ca13486e8e5",
-                "shasum": ""
-            },
-            "require": {
-                "ez-php/contracts": "0.*",
-                "php": "^8.5"
-            },
-            "require-dev": {
-                "ez-php/docker": "0.*",
-                "ez-php/testing-application": "0.*",
-                "friendsofphp/php-cs-fixer": "^3.94",
-                "phpstan/phpstan": "^2.1",
-                "phpstan/phpstan-deprecation-rules": "^2.0",
-                "phpstan/phpstan-strict-rules": "^2.0",
-                "phpunit/phpunit": "^13.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "EzPhp\\I18n\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Andreas Uretschnig",
-                    "email": "andreas.uretschnig@gmail.com"
-                }
-            ],
-            "description": "Internationalisation module for the ez-php framework — file-based translations with dot-notation keys and locale fallback",
-            "homepage": "https://github.com/ez-php/i18n",
-            "keywords": [
-                "ez-php",
-                "framework",
-                "i18n",
-                "internationalization",
-                "localisation",
-                "php",
-                "translation"
-            ],
-            "support": {
-                "issues": "https://github.com/ez-php/i18n/issues",
-                "source": "https://github.com/ez-php/i18n"
-            },
-            "time": "2026-03-24T22:14:21+00:00"
-        },
-        {
             "name": "ez-php/orm",
-            "version": "0.9.3",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/orm.git",
-                "reference": "d5976d5ddc2d118e64a682e188d61a21d26387fa"
+                "reference": "8ca338b490c24cd7e605cc0217b7bc359d0e4a72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/orm/zipball/d5976d5ddc2d118e64a682e188d61a21d26387fa",
-                "reference": "d5976d5ddc2d118e64a682e188d61a21d26387fa",
+                "url": "https://api.github.com/repos/ez-php/orm/zipball/8ca338b490c24cd7e605cc0217b7bc359d0e4a72",
+                "reference": "8ca338b490c24cd7e605cc0217b7bc359d0e4a72",
                 "shasum": ""
             },
             "require": {
-                "ez-php/cache": "0.*",
-                "ez-php/console": "0.*",
-                "ez-php/contracts": "0.*",
+                "ez-php/cache": "*",
+                "ez-php/console": "*",
+                "ez-php/contracts": "*",
                 "php": "^8.5"
             },
             "require-dev": {
-                "ez-php/docker": "0.*",
-                "ez-php/testing-application": "0.*",
+                "ez-php/docker": "*",
+                "ez-php/testing-application": "*",
                 "friendsofphp/php-cs-fixer": "^3.94",
                 "phpstan/phpstan": "^2.1",
                 "phpstan/phpstan-deprecation-rules": "^2.0",
@@ -843,7 +779,7 @@
                 "issues": "https://github.com/ez-php/orm/issues",
                 "source": "https://github.com/ez-php/orm"
             },
-            "time": "2026-03-24T22:14:21+00:00"
+            "time": "2026-03-24T23:51:18+00:00"
         },
         {
             "name": "ez-php/testing",
@@ -965,68 +901,6 @@
                 "source": "https://github.com/ez-php/testing-application"
             },
             "time": "2026-03-24T23:47:32+00:00"
-        },
-        {
-            "name": "ez-php/validation",
-            "version": "0.9.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ez-php/validation.git",
-                "reference": "9fcfb4149e23725cda48d3b7cab729f015c8a4e1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/validation/zipball/9fcfb4149e23725cda48d3b7cab729f015c8a4e1",
-                "reference": "9fcfb4149e23725cda48d3b7cab729f015c8a4e1",
-                "shasum": ""
-            },
-            "require": {
-                "ez-php/contracts": "0.*",
-                "php": "^8.5"
-            },
-            "require-dev": {
-                "ez-php/docker": "0.*",
-                "ez-php/i18n": "0.*",
-                "ez-php/testing-application": "0.*",
-                "friendsofphp/php-cs-fixer": "^3.94",
-                "phpstan/phpstan": "^2.1",
-                "phpstan/phpstan-deprecation-rules": "^2.0",
-                "phpstan/phpstan-strict-rules": "^2.0",
-                "phpunit/phpunit": "^13.0"
-            },
-            "suggest": {
-                "ez-php/i18n": "Required for localised validation error messages via Translator."
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "EzPhp\\Validation\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Andreas Uretschnig",
-                    "email": "andreas.uretschnig@gmail.com"
-                }
-            ],
-            "description": "Validation module for the ez-php framework — rule-based validator with database-backed unique/exists rules and optional i18n support",
-            "homepage": "https://github.com/ez-php/validation",
-            "keywords": [
-                "ez-php",
-                "framework",
-                "php",
-                "validation",
-                "validator"
-            ],
-            "support": {
-                "issues": "https://github.com/ez-php/validation/issues",
-                "source": "https://github.com/ez-php/validation"
-            },
-            "time": "2026-03-24T22:14:17+00:00"
         },
         {
             "name": "fidry/cpu-core-counter",
