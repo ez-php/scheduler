@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use PHPUnit\Framework\TestCase as BaseTestCase;
+use EzPhp\Testing\ApplicationTestCase as BaseTestCase;
 
 /**
  * Class TestCase
