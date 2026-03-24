@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9df66ac158210394e8ea89166956464d",
+    "content-hash": "f801d09de44779a010522c0d31716482",
     "packages": [],
     "packages-dev": [
         {
@@ -341,6 +341,178 @@
             "time": "2023-08-08T05:53:35+00:00"
         },
         {
+            "name": "ez-php/cache",
+            "version": "0.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/cache.git",
+                "reference": "b6865a7f115d3c8683ad6745bf2857b9ed425555"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/cache/zipball/b6865a7f115d3c8683ad6745bf2857b9ed425555",
+                "reference": "b6865a7f115d3c8683ad6745bf2857b9ed425555",
+                "shasum": ""
+            },
+            "require": {
+                "ez-php/contracts": "0.*",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "0.*",
+                "ez-php/testing-application": "0.*",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Cache\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "Cache module for the ez-php framework — array, file, and Redis drivers with a unified interface",
+            "homepage": "https://github.com/ez-php/cache",
+            "keywords": [
+                "cache",
+                "ez-php",
+                "framework",
+                "php",
+                "redis"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/cache/issues",
+                "source": "https://github.com/ez-php/cache"
+            },
+            "time": "2026-03-24T22:14:20+00:00"
+        },
+        {
+            "name": "ez-php/console",
+            "version": "0.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/console.git",
+                "reference": "158e9fe77568093955535a77280498dd77893923"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/console/zipball/158e9fe77568093955535a77280498dd77893923",
+                "reference": "158e9fe77568093955535a77280498dd77893923",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "0.*",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Console\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "Lightweight console infrastructure for PHP — command dispatcher, argument parser, and colored output helpers",
+            "homepage": "https://github.com/ez-php/console",
+            "keywords": [
+                "cli",
+                "command",
+                "console",
+                "php",
+                "terminal"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/console/issues",
+                "source": "https://github.com/ez-php/console"
+            },
+            "time": "2026-03-24T22:14:18+00:00"
+        },
+        {
+            "name": "ez-php/contracts",
+            "version": "0.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/contracts.git",
+                "reference": "350f70288b877a71a487ef8bee3ebd24ebe5f474"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/contracts/zipball/350f70288b877a71a487ef8bee3ebd24ebe5f474",
+                "reference": "350f70288b877a71a487ef8bee3ebd24ebe5f474",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "ez-php/http": "0.*",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "0.*",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Contracts\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "Shared interfaces and abstract base classes for the ez-php framework — zero framework coupling for standalone modules",
+            "homepage": "https://github.com/ez-php/contracts",
+            "keywords": [
+                "contracts",
+                "dependency-injection",
+                "ez-php",
+                "interfaces",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/contracts/issues",
+                "source": "https://github.com/ez-php/contracts"
+            },
+            "time": "2026-03-24T22:14:17+00:00"
+        },
+        {
             "name": "ez-php/docker",
             "version": "0.9.3",
             "source": {
@@ -372,6 +544,489 @@
                 "source": "https://github.com/ez-php/docker/tree/v0.9.3"
             },
             "time": "2026-03-24T22:14:18+00:00"
+        },
+        {
+            "name": "ez-php/dotenv",
+            "version": "0.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/dotenv.git",
+                "reference": "daee2483beec2f532df061094f789030ea115e3b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/dotenv/zipball/daee2483beec2f532df061094f789030ea115e3b",
+                "reference": "daee2483beec2f532df061094f789030ea115e3b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "0.*",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Env\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "Lightweight .env file loader for PHP — supports quoted values, variable interpolation, and immutable loading",
+            "homepage": "https://github.com/ez-php/dotenv",
+            "keywords": [
+                "config",
+                "dotenv",
+                "env",
+                "environment",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/dotenv/issues",
+                "source": "https://github.com/ez-php/dotenv"
+            },
+            "time": "2026-03-24T22:14:19+00:00"
+        },
+        {
+            "name": "ez-php/framework",
+            "version": "0.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/framework.git",
+                "reference": "b8f2a572322d4dae7a65c00769d2431977064f2a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/framework/zipball/b8f2a572322d4dae7a65c00769d2431977064f2a",
+                "reference": "b8f2a572322d4dae7a65c00769d2431977064f2a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "ez-php/console": "0.*",
+                "ez-php/contracts": "0.*",
+                "ez-php/dotenv": "0.*",
+                "ez-php/http": "0.*",
+                "ez-php/i18n": "0.*",
+                "ez-php/validation": "0.*",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "0.*",
+                "ez-php/testing-application": "0.*",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "Lightweight PHP framework core — dependency injection, routing, middleware, and database migrations",
+            "homepage": "https://github.com/ez-php/framework",
+            "keywords": [
+                "dependency-injection",
+                "framework",
+                "middleware",
+                "migration",
+                "php",
+                "routing"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/framework/issues",
+                "source": "https://github.com/ez-php/framework"
+            },
+            "time": "2026-03-24T22:14:22+00:00"
+        },
+        {
+            "name": "ez-php/http",
+            "version": "0.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/http.git",
+                "reference": "ad379a1350ec9d47d3cf3c1cce9e8940a85a1b22"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/http/zipball/ad379a1350ec9d47d3cf3c1cce9e8940a85a1b22",
+                "reference": "ad379a1350ec9d47d3cf3c1cce9e8940a85a1b22",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "0.*",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Http\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "HTTP message objects for the ez-php framework — immutable Request, Response, RequestFactory, and ResponseEmitter. Zero dependencies.",
+            "homepage": "https://github.com/ez-php/http",
+            "keywords": [
+                "http",
+                "php",
+                "psr",
+                "request",
+                "response"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/http/issues",
+                "source": "https://github.com/ez-php/http"
+            },
+            "time": "2026-03-24T22:14:21+00:00"
+        },
+        {
+            "name": "ez-php/i18n",
+            "version": "0.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/i18n.git",
+                "reference": "3ebbc641f165d11e44f4d4c302350ca13486e8e5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/i18n/zipball/3ebbc641f165d11e44f4d4c302350ca13486e8e5",
+                "reference": "3ebbc641f165d11e44f4d4c302350ca13486e8e5",
+                "shasum": ""
+            },
+            "require": {
+                "ez-php/contracts": "0.*",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "0.*",
+                "ez-php/testing-application": "0.*",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\I18n\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "Internationalisation module for the ez-php framework — file-based translations with dot-notation keys and locale fallback",
+            "homepage": "https://github.com/ez-php/i18n",
+            "keywords": [
+                "ez-php",
+                "framework",
+                "i18n",
+                "internationalization",
+                "localisation",
+                "php",
+                "translation"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/i18n/issues",
+                "source": "https://github.com/ez-php/i18n"
+            },
+            "time": "2026-03-24T22:14:21+00:00"
+        },
+        {
+            "name": "ez-php/orm",
+            "version": "0.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/orm.git",
+                "reference": "d5976d5ddc2d118e64a682e188d61a21d26387fa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/orm/zipball/d5976d5ddc2d118e64a682e188d61a21d26387fa",
+                "reference": "d5976d5ddc2d118e64a682e188d61a21d26387fa",
+                "shasum": ""
+            },
+            "require": {
+                "ez-php/cache": "0.*",
+                "ez-php/console": "0.*",
+                "ez-php/contracts": "0.*",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "0.*",
+                "ez-php/testing-application": "0.*",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Orm\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "ORM module for the ez-php framework — Active Record style models with a fluent query builder and schema builder",
+            "homepage": "https://github.com/ez-php/orm",
+            "keywords": [
+                "active-record",
+                "database",
+                "ez-php",
+                "framework",
+                "orm",
+                "php",
+                "query-builder",
+                "schema-builder"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/orm/issues",
+                "source": "https://github.com/ez-php/orm"
+            },
+            "time": "2026-03-24T22:14:21+00:00"
+        },
+        {
+            "name": "ez-php/testing",
+            "version": "0.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/testing.git",
+                "reference": "cf7d9eee8a1b58c7d0f38dd9c684c680a258df36"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/testing/zipball/cf7d9eee8a1b58c7d0f38dd9c684c680a258df36",
+                "reference": "cf7d9eee8a1b58c7d0f38dd9c684c680a258df36",
+                "shasum": ""
+            },
+            "require": {
+                "ez-php/http": "0.*",
+                "ez-php/orm": "0.*",
+                "php": "^8.5",
+                "phpunit/phpunit": "^13.0"
+            },
+            "require-dev": {
+                "ez-php/docker": "0.*",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Testing\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "Test utilities for the ez-php framework — ApplicationTestCase, DatabaseTestCase, HttpTestCase, ModelFactory",
+            "homepage": "https://github.com/ez-php/testing",
+            "keywords": [
+                "ez-php",
+                "factory",
+                "framework",
+                "php",
+                "phpunit",
+                "test-case",
+                "testing"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/testing/issues",
+                "source": "https://github.com/ez-php/testing"
+            },
+            "time": "2026-03-24T22:14:18+00:00"
+        },
+        {
+            "name": "ez-php/testing-application",
+            "version": "0.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/testing-application.git",
+                "reference": "32ec784fe5559f869d749949c6d9f9b904ddb73a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/testing-application/zipball/32ec784fe5559f869d749949c6d9f9b904ddb73a",
+                "reference": "32ec784fe5559f869d749949c6d9f9b904ddb73a",
+                "shasum": ""
+            },
+            "require": {
+                "ez-php/contracts": "0.*",
+                "ez-php/framework": "0.*",
+                "ez-php/http": "0.*",
+                "ez-php/testing": "0.*",
+                "php": "^8.5",
+                "phpunit/phpunit": "^13.0"
+            },
+            "require-dev": {
+                "ez-php/docker": "0.*",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Testing\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "Framework-coupled test base classes for ez-php — ApplicationTestCase, DatabaseTestCase, HttpTestCase",
+            "homepage": "https://github.com/ez-php/testing-application",
+            "keywords": [
+                "ez-php",
+                "framework",
+                "php",
+                "phpunit",
+                "test-case",
+                "testing"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/testing-application/issues",
+                "source": "https://github.com/ez-php/testing-application"
+            },
+            "time": "2026-03-24T22:14:16+00:00"
+        },
+        {
+            "name": "ez-php/validation",
+            "version": "0.9.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/validation.git",
+                "reference": "9fcfb4149e23725cda48d3b7cab729f015c8a4e1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/validation/zipball/9fcfb4149e23725cda48d3b7cab729f015c8a4e1",
+                "reference": "9fcfb4149e23725cda48d3b7cab729f015c8a4e1",
+                "shasum": ""
+            },
+            "require": {
+                "ez-php/contracts": "0.*",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "0.*",
+                "ez-php/i18n": "0.*",
+                "ez-php/testing-application": "0.*",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "suggest": {
+                "ez-php/i18n": "Required for localised validation error messages via Translator."
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Validation\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "Validation module for the ez-php framework — rule-based validator with database-backed unique/exists rules and optional i18n support",
+            "homepage": "https://github.com/ez-php/validation",
+            "keywords": [
+                "ez-php",
+                "framework",
+                "php",
+                "validation",
+                "validator"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/validation/issues",
+                "source": "https://github.com/ez-php/validation"
+            },
+            "time": "2026-03-24T22:14:17+00:00"
         },
         {
             "name": "fidry/cpu-core-counter",
