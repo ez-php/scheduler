@@ -6,6 +6,7 @@ All notable changes to `ez-php/scheduler` are documented here.
 
 ### Documentation
 - Update CHANGELOG for v0.9.3 [skip ci] (38a2fe0)
+- Update CHANGELOG for v1.0.0 [skip ci] (1227ba1)
 
 
 ## [v0.9.3] — 2026-03-24
