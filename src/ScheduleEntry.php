@@ -168,6 +168,8 @@ final class ScheduleEntry
     /**
      * Return whether overlap prevention is active for this entry.
      *
+     * @internal Called by Scheduler::run(); not part of the public entry API.
+     *
      * @return bool
      */
     public function shouldSkipIfOverlapping(): bool
@@ -178,6 +180,8 @@ final class ScheduleEntry
     /**
      * Return a stable mutex key derived from the command name.
      *
+     * @internal Called by Scheduler::run(); not part of the public entry API.
+     *
      * @return string
      */
     public function getMutexKey(): string
@@ -187,6 +191,8 @@ final class ScheduleEntry
 
     /**
      * Check whether this entry is due at the given time.
+     *
+     * @internal Called by Scheduler::dueEntries(); not part of the public entry API.
      *
      * @param DateTimeInterface $time The moment to evaluate (typically now).
      *
