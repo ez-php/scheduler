@@ -1,6 +1,6 @@
 {
     "name": "ez-php/scheduler",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Cron-based job scheduler with mutex-backed overlap prevention for ez-php applications",
     "type": "library",
     "license": "MIT",
@@ -25,13 +25,13 @@
         "php": "^8.5"
     },
     "require-dev": {
-        "ez-php/docker": "*",
+        "ez-php/docker": "^1.0",
         "phpunit/phpunit": "^13.0",
         "phpstan/phpstan": "^2.1",
         "friendsofphp/php-cs-fixer": "^3.94",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpstan/phpstan-deprecation-rules": "^2.0",
-        "ez-php/testing-application": "*"
+        "ez-php/testing-application": "^1.0"
     },
     "autoload": {
         "psr-4": {
