@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "52917d4466df8f9fc8d3c473565d5997",
+    "content-hash": "1965e8574540db3df292c36b9f28ae1d",
     "packages": [],
     "packages-dev": [
         {
@@ -457,16 +457,16 @@
         },
         {
             "name": "ez-php/contracts",
-            "version": "1.1.1",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/contracts.git",
-                "reference": "2bf163d0b66f8b87939595a4739dedfacfcd98c8"
+                "reference": "e2d187d59c470d94b5a10a073fc69af926013a4a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/contracts/zipball/2bf163d0b66f8b87939595a4739dedfacfcd98c8",
-                "reference": "2bf163d0b66f8b87939595a4739dedfacfcd98c8",
+                "url": "https://api.github.com/repos/ez-php/contracts/zipball/e2d187d59c470d94b5a10a073fc69af926013a4a",
+                "reference": "e2d187d59c470d94b5a10a073fc69af926013a4a",
                 "shasum": ""
             },
             "require": {
@@ -512,7 +512,7 @@
                 "issues": "https://github.com/ez-php/contracts/issues",
                 "source": "https://github.com/ez-php/contracts"
             },
-            "time": "2026-03-28T14:25:51+00:00"
+            "time": "2026-03-29T06:37:56+00:00"
         },
         {
             "name": "ez-php/docker",
