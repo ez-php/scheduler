@@ -606,31 +606,31 @@
         },
         {
             "name": "ez-php/framework",
-            "version": "1.1.1",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/framework.git",
-                "reference": "748a46d2b28bc8b970547983d4125f0386b5755e"
+                "reference": "b556a8b78dc0b9bee913bdb6c64b7e7d7cafa699"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/framework/zipball/748a46d2b28bc8b970547983d4125f0386b5755e",
-                "reference": "748a46d2b28bc8b970547983d4125f0386b5755e",
+                "url": "https://api.github.com/repos/ez-php/framework/zipball/b556a8b78dc0b9bee913bdb6c64b7e7d7cafa699",
+                "reference": "b556a8b78dc0b9bee913bdb6c64b7e7d7cafa699",
                 "shasum": ""
             },
             "require": {
                 "ext-pdo": "*",
-                "ez-php/console": "^1.1",
-                "ez-php/contracts": "^1.1",
-                "ez-php/dotenv": "^1.1",
-                "ez-php/http": "^1.1",
-                "ez-php/i18n": "^1.1",
-                "ez-php/validation": "^1.1",
+                "ez-php/console": "^1.0",
+                "ez-php/contracts": "^1.0",
+                "ez-php/dotenv": "^1.0",
+                "ez-php/http": "^1.0",
+                "ez-php/i18n": "^1.0",
+                "ez-php/validation": "^1.0",
                 "php": "^8.5"
             },
             "require-dev": {
-                "ez-php/docker": "^1.1",
-                "ez-php/testing-application": "^1.1",
+                "ez-php/docker": "^1.0",
+                "ez-php/testing-application": "^1.0",
                 "friendsofphp/php-cs-fixer": "^3.94",
                 "phpstan/phpstan": "^2.1",
                 "phpstan/phpstan-deprecation-rules": "^2.0",
@@ -667,7 +667,7 @@
                 "issues": "https://github.com/ez-php/framework/issues",
                 "source": "https://github.com/ez-php/framework"
             },
-            "time": "2026-03-28T14:25:55+00:00"
+            "time": "2026-03-29T07:05:14+00:00"
         },
         {
             "name": "ez-php/http",
