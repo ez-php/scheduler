@@ -120,7 +120,7 @@ Every module `CLAUDE.md` must follow this exact structure:
 
 ### 3 — Docker scaffold
 
-Run from the new module root (requires `"ez-php/docker": "0.*"` in `require-dev`):
+Run from the new module root (requires `"ez-php/docker": "^1.0"` in `require-dev`):
 
 ```
 vendor/bin/docker-init
@@ -142,7 +142,7 @@ After scaffolding:
 | `ez-php/framework` | 3307 | — |
 | `ez-php/orm` | 3309 | — |
 | `ez-php/cache` | — | 6380 |
-| **next free** | **3310** | **6381** |
+| **next free** | **3311** | **6383** |
 
 Only set a port for services the module actually uses. Modules without external services need no port config.
 
