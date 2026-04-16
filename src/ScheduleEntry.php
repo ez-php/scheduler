@@ -32,6 +32,8 @@ final class ScheduleEntry
 
     private bool $noOverlap = false;
 
+    private ?string $jobName = null;
+
     /**
      * @param string $command Console command name as registered in the application.
      */
@@ -123,6 +125,33 @@ final class ScheduleEntry
         return $this;
     }
 
+    // ── Name ─────────────────────────────────────────────────────────────────
+
+    /**
+     * Assign a human-readable name to this scheduled job.
+     * The name is used in log messages and as the mutex key when set.
+     *
+     * @param string $name A short, unique identifier for this job (e.g. 'robuddy-tick').
+     *
+     * @return $this
+     */
+    public function name(string $name): self
+    {
+        $this->jobName = $name;
+
+        return $this;
+    }
+
+    /**
+     * Return the job name, or null if none was set.
+     *
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->jobName;
+    }
+
     // ── Overlap prevention ────────────────────────────────────────────────────
 
     /**
@@ -186,7 +215,7 @@ final class ScheduleEntry
      */
     public function getMutexKey(): string
     {
-        return 'scheduler:' . sha1($this->command);
+        return 'scheduler:' . sha1($this->jobName ?? $this->command);
     }
 
     /**

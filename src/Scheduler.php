@@ -23,6 +23,10 @@ use DateTimeInterface;
  * withoutOverlapping(), the entry is skipped silently if the lock is taken,
  * and the lock is released (via finally) after the executor returns.
  *
+ * An optional logger closure receives plain-text messages for each START,
+ * DONE, and ERROR event. Pass a PSR-3 logger's info/error methods wrapped
+ * in a closure, or any callable(string): void.
+ *
  * @package EzPhp\Scheduler
  */
 final class Scheduler
@@ -33,10 +37,14 @@ final class Scheduler
     private array $entries = [];
 
     /**
-     * @param MutexInterface|null $mutex Optional mutex for withoutOverlapping() support.
+     * @param MutexInterface|null                $mutex  Optional mutex for withoutOverlapping() support.
+     * @param (\Closure(string): void)|null      $logger Optional log sink. Called with a plain-text
+     *                                                   message on START, DONE, and ERROR events.
      */
-    public function __construct(private readonly ?MutexInterface $mutex = null)
-    {
+    public function __construct(
+        private readonly ?MutexInterface $mutex = null,
+        private readonly ?\Closure $logger = null,
+    ) {
     }
 
     /**
@@ -112,13 +120,51 @@ final class Scheduler
                 }
 
                 try {
-                    $executor($entry->getCommand());
+                    $this->executeEntry($entry, $executor);
                 } finally {
                     $this->mutex->release($key);
                 }
             } else {
-                $executor($entry->getCommand());
+                $this->executeEntry($entry, $executor);
             }
+        }
+    }
+
+    /**
+     * Execute a single entry and log start, finish, and any error.
+     *
+     * @param ScheduleEntry        $entry
+     * @param callable(string): void $executor
+     *
+     * @return void
+     */
+    private function executeEntry(ScheduleEntry $entry, callable $executor): void
+    {
+        $label = $entry->getName() ?? $entry->getCommand();
+        $start = microtime(true);
+
+        $this->log('[START] ' . $label . ' at ' . date('Y-m-d H:i:s'));
+
+        try {
+            $executor($entry->getCommand());
+            $elapsed = round(microtime(true) - $start, 3);
+            $this->log('[DONE]  ' . $label . ' finished in ' . $elapsed . 's');
+        } catch (\Throwable $e) {
+            $elapsed = round(microtime(true) - $start, 3);
+            $this->log('[ERROR] ' . $label . ' failed after ' . $elapsed . 's: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return void
+     */
+    private function log(string $message): void
+    {
+        if ($this->logger !== null) {
+            ($this->logger)($message);
         }
     }
 }

@@ -148,4 +148,46 @@ final class ScheduleEntryTest extends TestCase
         $this->assertSame($entry, $entry->monthly());
         $this->assertSame($entry, $entry->withoutOverlapping());
     }
+
+    // ── name ──────────────────────────────────────────────────────────────────
+
+    public function testNameDefaultsToNull(): void
+    {
+        $entry = new ScheduleEntry('queue:work');
+
+        $this->assertNull($entry->getName());
+    }
+
+    public function testNameSetterStoresName(): void
+    {
+        $entry = (new ScheduleEntry('queue:work'))->name('robuddy-tick');
+
+        $this->assertSame('robuddy-tick', $entry->getName());
+    }
+
+    public function testNameReturnsFluentSelf(): void
+    {
+        $entry = new ScheduleEntry('cmd');
+
+        $this->assertSame($entry, $entry->name('my-job'));
+    }
+
+    public function testMutexKeyUsesNameWhenSet(): void
+    {
+        $withName = (new ScheduleEntry('queue:work'))->name('tick');
+        $withoutName = new ScheduleEntry('queue:work');
+
+        // Key with name differs from key without name
+        $this->assertNotSame($withName->getMutexKey(), $withoutName->getMutexKey());
+        // Key is stable for the same name
+        $this->assertSame($withName->getMutexKey(), (new ScheduleEntry('other-cmd'))->name('tick')->getMutexKey());
+    }
+
+    public function testMutexKeyFallsBackToCommandHashWithoutName(): void
+    {
+        $a = new ScheduleEntry('queue:work');
+        $b = new ScheduleEntry('queue:work');
+
+        $this->assertSame($a->getMutexKey(), $b->getMutexKey());
+    }
 }

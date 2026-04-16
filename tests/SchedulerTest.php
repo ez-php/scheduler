@@ -183,6 +183,85 @@ final class SchedulerTest extends TestCase
         $this->assertSame([$entry->getMutexKey()], $mutex->released);
     }
 
+    // ── logging ───────────────────────────────────────────────────────────────
+
+    public function testRunLogsStartAndFinishForEachEntry(): void
+    {
+        $logs = [];
+        $logger = static function (string $msg) use (&$logs): void {
+            $logs[] = $msg;
+        };
+
+        $scheduler = new Scheduler(null, $logger);
+        $scheduler->command('my-cmd')->everyMinute();
+
+        $scheduler->run($this->alwaysNow, static function (string $cmd): void {
+        });
+
+        $this->assertCount(2, $logs);
+        $this->assertStringContainsString('[START]', $logs[0]);
+        $this->assertStringContainsString('my-cmd', $logs[0]);
+        $this->assertStringContainsString('[DONE]', $logs[1]);
+        $this->assertStringContainsString('my-cmd', $logs[1]);
+    }
+
+    public function testRunUsesJobNameInLogWhenSet(): void
+    {
+        $logs = [];
+        $logger = static function (string $msg) use (&$logs): void {
+            $logs[] = $msg;
+        };
+
+        $scheduler = new Scheduler(null, $logger);
+        $scheduler->command('my-cmd')->name('robuddy-tick')->everyMinute();
+
+        $scheduler->run($this->alwaysNow, static function (string $cmd): void {
+        });
+
+        $this->assertStringContainsString('robuddy-tick', $logs[0]);
+        $this->assertStringNotContainsString('my-cmd', $logs[0]);
+    }
+
+    public function testRunLogsErrorAndRethrowsOnExecutorException(): void
+    {
+        $logs = [];
+        $logger = static function (string $msg) use (&$logs): void {
+            $logs[] = $msg;
+        };
+
+        $scheduler = new Scheduler(null, $logger);
+        $scheduler->command('fail-cmd')->everyMinute();
+
+        $thrown = null;
+
+        try {
+            $scheduler->run($this->alwaysNow, static function (string $cmd): void {
+                throw new \RuntimeException('executor exploded');
+            });
+        } catch (\RuntimeException $e) {
+            $thrown = $e;
+        }
+
+        $this->assertNotNull($thrown);
+        $this->assertCount(2, $logs);
+        $this->assertStringContainsString('[START]', $logs[0]);
+        $this->assertStringContainsString('[ERROR]', $logs[1]);
+        $this->assertStringContainsString('executor exploded', $logs[1]);
+    }
+
+    public function testRunWithoutLoggerDoesNotThrow(): void
+    {
+        $scheduler = new Scheduler(); // no logger
+        $scheduler->command('cmd')->everyMinute();
+
+        $called = false;
+        $scheduler->run($this->alwaysNow, static function (string $cmd) use (&$called): void {
+            $called = true;
+        });
+
+        $this->assertTrue($called);
+    }
+
     public function testRunReleasesLockEvenWhenExecutorThrows(): void
     {
         $mutex = new class () implements MutexInterface {
