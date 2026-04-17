@@ -131,7 +131,7 @@ final class ScheduleEntry
      * Assign a human-readable name to this scheduled job.
      * The name is used in log messages and as the mutex key when set.
      *
-     * @param string $name A short, unique identifier for this job (e.g. 'robuddy-tick').
+     * @param string $name A short, unique identifier for this job (e.g. 'user-tick').
      *
      * @return $this
      */

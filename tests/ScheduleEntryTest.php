@@ -160,9 +160,9 @@ final class ScheduleEntryTest extends TestCase
 
     public function testNameSetterStoresName(): void
     {
-        $entry = (new ScheduleEntry('queue:work'))->name('robuddy-tick');
+        $entry = (new ScheduleEntry('queue:work'))->name('user-tick');
 
-        $this->assertSame('robuddy-tick', $entry->getName());
+        $this->assertSame('user-tick', $entry->getName());
     }
 
     public function testNameReturnsFluentSelf(): void

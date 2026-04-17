@@ -213,12 +213,12 @@ final class SchedulerTest extends TestCase
         };
 
         $scheduler = new Scheduler(null, $logger);
-        $scheduler->command('my-cmd')->name('robuddy-tick')->everyMinute();
+        $scheduler->command('my-cmd')->name('user-tick')->everyMinute();
 
         $scheduler->run($this->alwaysNow, static function (string $cmd): void {
         });
 
-        $this->assertStringContainsString('robuddy-tick', $logs[0]);
+        $this->assertStringContainsString('user-tick', $logs[0]);
         $this->assertStringNotContainsString('my-cmd', $logs[0]);
     }
 
