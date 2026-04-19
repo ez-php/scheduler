@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c547fb2e3bc98d9f6a5a8c0b617adf10",
+    "content-hash": "5ea42bbb6b98ee3d29c483648e4af5e5",
     "packages": [],
     "packages-dev": [
         {
@@ -675,16 +675,16 @@
         },
         {
             "name": "ez-php/framework",
-            "version": "1.7.0",
+            "version": "1.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/framework.git",
-                "reference": "48742b5a978a8bd923b115f589c12d292719ea36"
+                "reference": "d840dda9c75956dd669b6191c607f2050c2271ee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/framework/zipball/48742b5a978a8bd923b115f589c12d292719ea36",
-                "reference": "48742b5a978a8bd923b115f589c12d292719ea36",
+                "url": "https://api.github.com/repos/ez-php/framework/zipball/d840dda9c75956dd669b6191c607f2050c2271ee",
+                "reference": "d840dda9c75956dd669b6191c607f2050c2271ee",
                 "shasum": ""
             },
             "require": {
@@ -736,7 +736,7 @@
                 "issues": "https://github.com/ez-php/framework/issues",
                 "source": "https://github.com/ez-php/framework"
             },
-            "time": "2026-04-19T01:13:15+00:00"
+            "time": "2026-04-19T09:55:39+00:00"
         },
         {
             "name": "ez-php/http",
