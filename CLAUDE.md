@@ -28,6 +28,7 @@ docker compose exec app composer full
 Executes in order:
 1. `phpstan analyse` — static analysis, level 9, config: `phpstan.neon`
 2. `php-cs-fixer fix` — auto-fixes style (`@PSR12` + `@PHP83Migration` + strict rules)
+   *(Note: `@PHP85Migration` does not exist yet in php-cs-fixer; `@PHP83Migration` is the highest available and is used intentionally even though the project targets PHP 8.5)*
 3. `phpunit` — all tests with coverage
 
 Individual commands when needed:
@@ -142,6 +143,8 @@ After scaffolding:
 | `ez-php/framework` | 3307 | — |
 | `ez-php/orm` | 3309 | — |
 | `ez-php/cache` | — | 6380 |
+| `ez-php/queue` | 3310 | 6381 |
+| `ez-php/rate-limiter` | — | 6382 |
 | **next free** | **3311** | **6383** |
 
 Only set a port for services the module actually uses. Modules without external services need no port config.
