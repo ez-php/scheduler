@@ -103,8 +103,58 @@ $scheduler = new Scheduler($mutex);
 ```
 
 - Compatible with MySQL and SQLite.
-- No automatic TTL/expiry — stale rows from crashed processes must be cleaned manually.
+- No automatic TTL/expiry — stale rows from crashed processes must be cleaned manually. Use `DatabaseMutexWithExpiry` if that matters.
 - Suitable for multi-server deployments sharing the same database.
+
+### DatabaseMutexWithExpiry
+
+Same idea as `DatabaseMutex`, but each lock carries an expiry timestamp. If the
+process holding a lock dies without releasing it, the next `acquire()` reclaims
+the key once the expiry has passed — the schedule recovers on its own instead of
+blocking until someone clears the row by hand.
+
+```php
+use EzPhp\Scheduler\Mutex\DatabaseMutexWithExpiry;
+
+$mutex = new DatabaseMutexWithExpiry($pdo, 600); // TTL in seconds (default 3600)
+$scheduler = new Scheduler($mutex);
+```
+
+- Uses its own `scheduler_locks_ttl` table, so it coexists with `DatabaseMutex`.
+  (`CREATE TABLE IF NOT EXISTS` never adds a column to an existing table, so the
+  expiry column could not be retrofitted onto `scheduler_locks` safely.)
+- **Pick a TTL comfortably longer than the command's worst-case runtime.** A TTL
+  shorter than the actual runtime lets another process reclaim the lock while the
+  first is still working, which defeats overlap prevention entirely.
+- Expired rows are reclaimed lazily, per key, on the next acquire. There is no
+  background sweep — keys that stop being scheduled keep their last row.
+
+### RedisMutex
+
+For scheduled commands running on more than one host. `FileMutex` is bound to a
+single filesystem and `DatabaseMutex` to a single database; Redis is usually
+already shared across application servers.
+
+```php
+use EzPhp\Scheduler\Mutex\RedisMutex;
+
+$redis = new Redis();
+$redis->connect('127.0.0.1', 6379);
+
+$mutex = new RedisMutex($redis, 600); // TTL in seconds (default 3600)
+$scheduler = new Scheduler($mutex);
+```
+
+- Uses a single atomic `SET key value NX EX ttl`, so there is no read-then-write
+  race between concurrent cron processes.
+- Locks carry a TTL, so a crashed process does not block the schedule forever.
+  **Pick a TTL longer than the command's worst-case runtime.**
+- Keys are namespaced with `ez-php:scheduler:lock:` so they cannot collide with
+  application data in a shared Redis database.
+- **Fails closed**: if Redis is unreachable, `acquire()` returns false and the run
+  is skipped, because the lock cannot be proven free. Running a scheduled job
+  twice is the outcome this class exists to prevent.
+- Requires `ext-redis`; the constructor throws `RuntimeException` without it.
 
 ---
 

@@ -26,16 +26,20 @@ docker compose exec app composer full
 ```
 
 Executes in order:
-1. `phpstan analyse` — static analysis, level 9, config: `phpstan.neon`
-2. `php-cs-fixer fix` — auto-fixes style (`@PSR12` + `@PHP83Migration` + strict rules)
+1. `sync_guidelines.php --check` — fails if any `CLAUDE.md` has drifted from this file
+2. `check_test_classes.php` — fails on a duplicate test class name (all packages share the `Tests\` namespace, so a collision is a fatal error in the aggregated run, not a test failure)
+3. `phpstan analyse` — static analysis, level 9, config: `phpstan.neon`
+4. `php-cs-fixer fix` — auto-fixes style (`@PSR12` + `@PHP83Migration` + strict rules)
    *(Note: `@PHP85Migration` does not exist yet in php-cs-fixer; `@PHP83Migration` is the highest available and is used intentionally even though the project targets PHP 8.5)*
-3. `phpunit` — all tests with coverage
+5. `phpunit` — all tests with coverage
 
 Individual commands when needed:
 ```
-composer analyse   # PHPStan only
-composer cs        # CS Fixer only
-composer test      # PHPUnit only
+composer analyse             # PHPStan only
+composer cs                  # CS Fixer only
+composer test                # PHPUnit only
+composer guidelines:check    # CLAUDE.md drift only
+composer test-classes:check  # duplicate test class names only
 ```
 
 **PHPStan:** never suppress with `@phpstan-ignore-line` — always fix the root cause.
@@ -119,7 +123,47 @@ Every module `CLAUDE.md` must follow this exact structure:
    - Testing approach and infrastructure requirements (MySQL, Redis, etc.)
    - What does **not** belong in this module
 
-### 3 — Docker scaffold
+**Do not edit part 1 by hand.** It is generated from `CODING_GUIDELINES.md` by
+`sync_guidelines.php` at the project root:
+
+```
+php sync_guidelines.php            # rewrite every out-of-sync CLAUDE.md
+php sync_guidelines.php --check    # report drift, exit 1 if any (CI / pre-commit)
+```
+
+Edit `CODING_GUIDELINES.md`, then run the script — it replaces everything before the
+`# Package:` / `# Directory:` / `# Project:` heading and preserves the hand-written
+section below it byte-for-byte. Editing a single copy only creates drift; before this
+script existed, all 40 copies had diverged.
+
+### 3 — Scaffolding a new module
+
+`make_module.php` at the project root writes the required-file set and the monorepo
+wiring in one step, wrapping `docker-init` for the Docker subset:
+
+```
+composer module:make <name> -- --description="..."
+php make_module.php <name> --description="..." --services=mysql,redis
+```
+
+`<name>` is the kebab-case package name; the namespace is derived as
+`EzPhp\<PascalCase>` unless `--namespace=` overrides it (`bignum` → `BigNum` and
+`opcache` → `OPCache` are existing exceptions the guess gets wrong).
+
+It writes `modules/<name>/` and registers the module in the four places the monorepo
+needs it — root `composer.json` (`autoload.psr-4`), `phpstan.neon`, `phpunit.xml`
+(test suite **and** coverage source), and `packages.sh` (alphabetical position).
+
+Two things stay manual on purpose:
+
+- **`CLAUDE.md` part 1** — only the `# Package:` section is generated. Run
+  `composer guidelines:sync` afterwards; baking a guidelines copy into the generator
+  would recreate the drift the sync script exists to prevent.
+- **The host-port table below** (`--services` only) — editing it marks all ~40
+  `CLAUDE.md` copies as drifted at once, so the next `composer full` would fail for
+  a brand-new module. The generator prints which ports to claim instead.
+
+### 4 — Docker scaffold
 
 Run from the new module root (requires `"ez-php/docker": "^1.0"` in `require-dev`):
 
@@ -129,35 +173,39 @@ vendor/bin/docker-init
 
 This copies `Dockerfile`, `docker-compose.yml`, `.env.example`, `start.sh`, and `docker/` into the module, replacing `{{MODULE_NAME}}` placeholders. Existing files are never overwritten.
 
-Pass `--services` to merge MySQL/Redis service definitions directly into `docker-compose.yml` and uncomment the matching sections in `.env.example`, instead of adapting them by hand afterward:
+Pass `--services` to merge MySQL/Redis/Meilisearch service definitions directly into `docker-compose.yml` and uncomment the matching sections in `.env.example`, instead of adapting them by hand afterward:
 
 ```
 vendor/bin/docker-init --services=mysql
 vendor/bin/docker-init --services=redis
+vendor/bin/docker-init --services=meilisearch
 vendor/bin/docker-init --services=mysql,redis
 ```
 
 After scaffolding:
 
-1. Adapt `docker-compose.yml` — add or remove services (MySQL, Redis) as needed
+1. Adapt `docker-compose.yml` — add or remove services (MySQL, Redis, Meilisearch) as needed
 2. Adapt `.env.example` — fill in connection defaults matching the services above
 3. Assign a unique host port for each exposed service (see table below)
 
 **Allocated host ports:**
 
-| Package | `DB_HOST_PORT` (MySQL) | `REDIS_PORT` |
-|---|---|---|
-| root (`ez-php-project`) | 3306 | 6379 |
-| `ez-php/framework` | 3307 | — |
-| `ez-php/orm` | 3309 | — |
-| `ez-php/cache` | — | 6380 |
-| `ez-php/queue` | 3310 | 6381 |
-| `ez-php/rate-limiter` | — | 6382 |
-| **next free** | **3311** | **6383** |
+| Package | `DB_HOST_PORT` (MySQL) | `REDIS_PORT` | `MEILISEARCH_PORT` |
+|---|---|---|---|
+| root (`ez-php-project`) | 3306 | 6379 | 7700 |
+| `ez-php/framework` | 3307 | — | — |
+| `ez-php/orm` | 3309 | — | — |
+| `ez-php/cache` | — | 6380 | — |
+| `ez-php/queue` | 3310 | 6381 | — |
+| `ez-php/rate-limiter` | — | 6382 | — |
+| `ez-php/search` | — | — | 7701 |
+| **next free** | **3311** | **6383** | **7702** |
 
 Only set a port for services the module actually uses. Modules without external services need no port config.
 
-### 4 — Monorepo scripts
+> The `MEILISEARCH_PORT` column is the **host** port. Inside a Compose network the service is always reachable at `http://meilisearch:7700` regardless of the host mapping — only publish-side ports need to be unique.
+
+### 5 — Monorepo scripts
 
 `packages.sh` at the project root is the **central package registry**. Both `push_all.sh` and `update_all.sh` source it — the package list lives in exactly one place.
 
@@ -180,8 +228,10 @@ src/
 ├── ScheduleEntry.php           — fluent builder: frequency methods + withoutOverlapping()
 ├── Scheduler.php               — registry + dueEntries() + run(callable $executor)
 └── Mutex/
-    ├── FileMutex.php           — flock()-based mutex; lock files stored in a configurable directory
-    └── DatabaseMutex.php       — PDO INSERT/DELETE-based mutex; auto-creates scheduler_locks table
+    ├── FileMutex.php               — flock()-based mutex; lock files stored in a configurable directory
+    ├── DatabaseMutex.php           — PDO INSERT/DELETE-based mutex; auto-creates scheduler_locks table
+    ├── DatabaseMutexWithExpiry.php — as above plus a TTL; reclaims expired locks; auto-creates scheduler_locks_ttl
+    └── RedisMutex.php              — atomic SET NX EX lock; multi-host; requires ext-redis
 
 tests/
 ├── TestCase.php                — base PHPUnit test case
@@ -189,7 +239,9 @@ tests/
 ├── SchedulerTest.php           — covers Scheduler: registration, dueEntries, run, mutex acquire/release/skip
 └── Mutex/
     ├── FileMutexTest.php       — covers FileMutex: acquire, release, double-lock, directory creation
-    └── DatabaseMutexTest.php   — covers DatabaseMutex: acquire, release, duplicate key, table creation (SQLite)
+    ├── DatabaseMutexTest.php   — covers DatabaseMutex: acquire, release, duplicate key, table creation (SQLite)
+    ├── DatabaseMutexWithExpiryTest.php — covers TTL reclaim, key isolation, table separation (SQLite)
+    └── RedisMutexTest.php       — covers acquire/release, cross-instance locking, key prefix, TTL (live Redis; skipped if absent)
 ```
 
 ---
@@ -245,7 +297,15 @@ Uses a `scheduler_locks` table (created via `CREATE TABLE IF NOT EXISTS` on cons
 - **Callable executor in `run()`** — Rather than injecting a `Console` instance, `run()` accepts `callable(string): void`. This keeps the scheduler standalone and testable with a simple closure.
 - **`MutexInterface` throws `SchedulerException` on misconfiguration, not on lock fail** — A missing mutex when `withoutOverlapping()` is requested is a programmer error (fail-fast). A failed lock acquire is a normal runtime event (silent skip).
 - **`FileMutex` uses `flock()` not `sem_get()`** — `flock()` is universally available without the `sysvsem` extension. The lock is tied to the file handle, so the process dying automatically releases it (no stale lock cleanup needed).
-- **`DatabaseMutex` has no expiry/TTL** — Stale locks (from crashed processes) must be cleaned manually. A TTL column with periodic cleanup was considered but deferred (YAGNI) — add a `DatabaseMutexWithExpiry` when needed.
+- **`DatabaseMutex` has no expiry/TTL; `DatabaseMutexWithExpiry` does** — `DatabaseMutex` keeps a lock until it is explicitly released, so a crashed process leaves a stale row that blocks that entry until cleared by hand. `DatabaseMutexWithExpiry` stores an `expires_at` timestamp and reclaims the key on the next acquire once it has passed. `DatabaseMutex` is left unchanged rather than extended.
+- **`DatabaseMutexWithExpiry` uses its own `scheduler_locks_ttl` table** — This is a compatibility constraint, not a style choice. Both classes create their table with `CREATE TABLE IF NOT EXISTS`, which is a no-op against an existing table and therefore never adds a column. Adding `expires_at` to `DatabaseMutex`'s `scheduler_locks` would ship code that queries a column absent on every already-deployed install, raising a `PDOException` at runtime. Separate tables let both mutexes coexist and make the choice explicit at construction.
+- **Reclaim and insert are not one atomic statement** — `acquire()` deletes an expired row for the key, then inserts. The primary key on `lock_key` provides mutual exclusion: if two processes both delete the same expired row, only one insert can succeed and the other returns false. A single atomic upsert would need dialect-specific syntax (`ON DUPLICATE KEY UPDATE` vs `ON CONFLICT`), which the two-statement form avoids.
+- **TTL is a safety net, not a runtime limit** — A TTL shorter than the command's actual runtime lets a second process reclaim the lock while the first is still working, defeating overlap prevention. The default is one hour (`DEFAULT_TTL_SECONDS`).
+- **`RedisMutex` uses `SET … NX EX`, one atomic command** — The set-if-absent test and the write are a single Redis operation, so there is no read-then-write race between cron processes. It is the driver for multi-host deployments: `FileMutex` is bound to one filesystem, `DatabaseMutex` to one database.
+- **`RedisMutex` fails *closed* on a Redis outage, unlike `ez-php/rate-limiter`'s `RedisDriver` which fails open** — The failure modes are not symmetric. An un-throttled request is a minor problem; running a scheduled job twice concurrently is precisely what the mutex exists to prevent. When Redis is unreachable the lock cannot be proven free, so `acquire()` returns false and the run is skipped.
+- **`RedisMutex` keys are namespaced with `KEY_PREFIX`** — Scheduler locks usually share a Redis database with application data; the prefix prevents collisions. The constant is public so tests can assert on the stored key.
+- **`ext-redis` is not declared in `composer.json`** — Matches `ez-php/rate-limiter`, which also ships a `RedisDriver` without declaring the extension. Availability is checked at construction with `extension_loaded()` and raises `RuntimeException`, keeping the package installable without Redis.
+- **Expiry stored as a Unix timestamp `INTEGER`** — Avoids `DATETIME` dialect differences between MySQL and SQLite and keeps the comparison a plain integer compare.
 - **`ScheduleEntry` is mutable** — Frequency and overlap flags are set after construction via fluent methods (the caller receives the entry from `Scheduler::command()`). Immutability would require a builder pattern for no real benefit.
 - **No `schedule:run` command in this package** — The framework already provides `ScheduleRunCommand`. Integrating with this module requires replacing `Scheduler` in the service provider and passing a suitable executor — documented in the README.
 
@@ -253,7 +313,9 @@ Uses a `scheduler_locks` table (created via `CREATE TABLE IF NOT EXISTS` on cons
 
 ## Testing Approach
 
-- **No external infrastructure** — All tests run in-process. `DatabaseMutexTest` uses an in-memory SQLite PDO. `FileMutexTest` uses temp directories cleaned in `tearDown()`.
+- **No external infrastructure** — All tests run in-process. `DatabaseMutexTest` and `DatabaseMutexWithExpiryTest` use an in-memory SQLite PDO. `FileMutexTest` uses temp directories cleaned in `tearDown()`.
+- **`RedisMutexTest` needs a live Redis** — Available via the root Docker Compose stack (`ez-php-redis`); it reads `REDIS_HOST`/`REDIS_PORT` and `markTestSkipped()`s when `ext-redis` is missing or the server is unreachable, so the module still tests green standalone. It uses Redis database **3**, since `ez-php/rate-limiter`'s tests use database 2. No `REDIS_PORT` was allocated to this module in the host-port table — the tests reuse the root stack rather than adding a scheduler-specific Redis service.
+- **Expiry is tested via TTL, not `sleep()`** — `DatabaseMutexWithExpiryTest` constructs the mutex with a TTL of `0` (or negative) so the lock is already reclaimable the moment it is written. This exercises the crash-recovery path with no clock abstraction and no slow test.
 - **`FileMutexTest::testAcquireReturnsFalseWhenAlreadyLocked`** — Two `FileMutex` instances on the same `lockDir` and same key simulate two concurrent processes. PHP's `flock(LOCK_EX|LOCK_NB)` on a second file handle to the same path correctly returns false when the first holds the lock.
 - **Anonymous class stubs** — `SchedulerTest` uses anonymous classes implementing `MutexInterface` instead of a mock framework. The `released` keys are exposed as public properties on the anonymous class (not by-reference constructor args) so PHPStan can verify reads.
 - **Uncovered lines** — Lines 41 and 60 of `FileMutex` (`mkdir()` failure and `fopen()` failure) are defensive OS-error guards untestable without filesystem mocking.
@@ -265,8 +327,8 @@ Uses a `scheduler_locks` table (created via `CREATE TABLE IF NOT EXISTS` on cons
 | Concern | Where it belongs |
 |---------|-----------------|
 | `schedule:run` console command | `ez-php/framework` `ScheduleRunCommand` (already exists) |
-| Mutex with automatic TTL/expiry cleanup | A future `DatabaseMutexWithExpiry` or separate concern |
-| Redis-based mutex | A future `RedisMutex` driver if/when needed |
+| Periodic/background purge of expired lock rows | Application layer — `DatabaseMutexWithExpiry` reclaims lazily per key on acquire; a global sweep of dead keys is a maintenance job |
+| Lock ownership tokens (release-only-if-still-mine) | Not implemented — `RedisMutex::release()` deletes the key unconditionally; a run that overruns its TTL could delete a lock another process has since taken |
 | Cron expression parsing (`* * * * *` syntax) | Out of scope — use predefined frequency methods |
 | Distributed locking beyond single-DB or single-FS scope | Application-level concern |
 | Job queuing / background processing | `ez-php/queue` |
