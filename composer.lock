@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f99ba457f82b485e6d7b08202de8a076",
+    "content-hash": "f1922788e493a8ce1ab4afd3e04a70d5",
     "packages": [],
     "packages-dev": [
         {
@@ -582,16 +582,16 @@
         },
         {
             "name": "ez-php/docker",
-            "version": "1.14.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/docker.git",
-                "reference": "568b21e2fcd30b2828c323b0921914681dc612ba"
+                "reference": "d43b9557c4e795591ea75776c17d088d9393f9d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/docker/zipball/568b21e2fcd30b2828c323b0921914681dc612ba",
-                "reference": "568b21e2fcd30b2828c323b0921914681dc612ba",
+                "url": "https://api.github.com/repos/ez-php/docker/zipball/d43b9557c4e795591ea75776c17d088d9393f9d9",
+                "reference": "d43b9557c4e795591ea75776c17d088d9393f9d9",
                 "shasum": ""
             },
             "require": {
@@ -609,9 +609,9 @@
             "description": "Docker base image source and scaffolding stubs for ez-php modules and projects",
             "support": {
                 "issues": "https://github.com/ez-php/docker/issues",
-                "source": "https://github.com/ez-php/docker/tree/v1.14.0"
+                "source": "https://github.com/ez-php/docker/tree/v2.0.0"
             },
-            "time": "2026-09-13T00:19:54+00:00"
+            "time": "2026-09-13T01:59:27+00:00"
         },
         {
             "name": "ez-php/dotenv",
@@ -977,16 +977,16 @@
         },
         {
             "name": "ez-php/testing-application",
-            "version": "1.14.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/testing-application.git",
-                "reference": "4fe3b19673c37ac53a77d02857fdb13332deef50"
+                "reference": "7c9083ea7efca6b780d02ef7cf96d21ce8938141"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/testing-application/zipball/4fe3b19673c37ac53a77d02857fdb13332deef50",
-                "reference": "4fe3b19673c37ac53a77d02857fdb13332deef50",
+                "url": "https://api.github.com/repos/ez-php/testing-application/zipball/7c9083ea7efca6b780d02ef7cf96d21ce8938141",
+                "reference": "7c9083ea7efca6b780d02ef7cf96d21ce8938141",
                 "shasum": ""
             },
             "require": {
@@ -1034,7 +1034,7 @@
                 "issues": "https://github.com/ez-php/testing-application/issues",
                 "source": "https://github.com/ez-php/testing-application"
             },
-            "time": "2026-09-13T01:45:42+00:00"
+            "time": "2026-09-13T01:59:22+00:00"
         },
         {
             "name": "ez-php/validation",
