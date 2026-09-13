@@ -917,16 +917,16 @@
         },
         {
             "name": "ez-php/testing",
-            "version": "1.13.1",
+            "version": "1.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/testing.git",
-                "reference": "165dc37309a1a2035b49c6130f3fb7f2af3e9d55"
+                "reference": "52764cb5a203b8d225b492cf74e7059de1132489"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/testing/zipball/165dc37309a1a2035b49c6130f3fb7f2af3e9d55",
-                "reference": "165dc37309a1a2035b49c6130f3fb7f2af3e9d55",
+                "url": "https://api.github.com/repos/ez-php/testing/zipball/52764cb5a203b8d225b492cf74e7059de1132489",
+                "reference": "52764cb5a203b8d225b492cf74e7059de1132489",
                 "shasum": ""
             },
             "require": {
@@ -973,7 +973,7 @@
                 "issues": "https://github.com/ez-php/testing/issues",
                 "source": "https://github.com/ez-php/testing"
             },
-            "time": "2026-09-12T18:02:28+00:00"
+            "time": "2026-09-13T00:31:08+00:00"
         },
         {
             "name": "ez-php/testing-application",
