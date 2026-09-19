@@ -147,6 +147,7 @@ final class ScheduleEntryTest extends TestCase
         $this->assertSame($entry, $entry->weekly());
         $this->assertSame($entry, $entry->monthly());
         $this->assertSame($entry, $entry->withoutOverlapping());
+        $this->assertSame($entry, $entry->cron('* * * * *'));
     }
 
     // ── name ──────────────────────────────────────────────────────────────────
@@ -189,5 +190,56 @@ final class ScheduleEntryTest extends TestCase
         $b = new ScheduleEntry('queue:work');
 
         $this->assertSame($a->getMutexKey(), $b->getMutexKey());
+    }
+
+    // ── cron ──────────────────────────────────────────────────────────────────
+
+    public function testCronEveryMinuteExpressionIsAlwaysDue(): void
+    {
+        $entry = (new ScheduleEntry('cmd'))->cron('* * * * *');
+
+        $this->assertTrue($entry->isDue(new DateTimeImmutable('2025-01-01 12:07:00')));
+        $this->assertSame('cron(* * * * *)', $entry->getFrequencyDescription());
+    }
+
+    public function testCronStepExpressionMatchesEveryNMinutes(): void
+    {
+        $entry = (new ScheduleEntry('cmd'))->cron('*/5 * * * *');
+
+        $this->assertTrue($entry->isDue(new DateTimeImmutable('2025-01-01 12:00:00')));
+        $this->assertTrue($entry->isDue(new DateTimeImmutable('2025-01-01 12:05:00')));
+        $this->assertFalse($entry->isDue(new DateTimeImmutable('2025-01-01 12:07:00')));
+    }
+
+    public function testCronExactFieldsMatchSpecificMoment(): void
+    {
+        $entry = (new ScheduleEntry('cmd'))->cron('30 6 1 * *');
+
+        $this->assertTrue($entry->isDue(new DateTimeImmutable('2025-03-01 06:30:00')));
+        $this->assertFalse($entry->isDue(new DateTimeImmutable('2025-03-02 06:30:00')));
+        $this->assertFalse($entry->isDue(new DateTimeImmutable('2025-03-01 06:31:00')));
+    }
+
+    public function testCronDayOfWeekFieldIsRespected(): void
+    {
+        $entry = (new ScheduleEntry('cmd'))->cron('0 0 * * 1');
+
+        // 2025-01-06 is a Monday
+        $this->assertTrue($entry->isDue(new DateTimeImmutable('2025-01-06 00:00:00')));
+        $this->assertFalse($entry->isDue(new DateTimeImmutable('2025-01-07 00:00:00')));
+    }
+
+    public function testCronMalformedExpressionIsNeverDue(): void
+    {
+        $entry = (new ScheduleEntry('cmd'))->cron('not a cron expression');
+
+        $this->assertFalse($entry->isDue(new DateTimeImmutable('2025-01-01 12:00:00')));
+    }
+
+    public function testCronReturnsFluentSelf(): void
+    {
+        $entry = new ScheduleEntry('cmd');
+
+        $this->assertSame($entry, $entry->cron('* * * * *'));
     }
 }

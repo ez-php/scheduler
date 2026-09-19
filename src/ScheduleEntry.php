@@ -125,6 +125,66 @@ final class ScheduleEntry
         return $this;
     }
 
+    /**
+     * Schedule the command using an explicit five-field cron expression
+     * (minute hour day-of-month month day-of-week). Supported field syntax:
+     * `*`, `N`, `*\/N` — the same subset `ez-php/queue`'s
+     * `Scheduling\ScheduledTask::cron()` parses, reimplemented here rather
+     * than depended on so this package keeps its "no framework dependency"
+     * constraint (see Design Decisions in CLAUDE.md).
+     *
+     * A malformed expression (not exactly five space-separated fields) is
+     * never due, matching how the other frequency methods fail closed
+     * rather than throwing.
+     *
+     * @param string $expression Cron expression: "minute hour dom month dow".
+     *
+     * @return $this
+     */
+    public function cron(string $expression): self
+    {
+        $fields = explode(' ', $expression);
+
+        if (count($fields) !== 5) {
+            $this->duePredicate = static fn (DateTimeInterface $t): bool => false;
+        } else {
+            $this->duePredicate = static fn (DateTimeInterface $t): bool => self::matchCronField($fields[0], (int) $t->format('i'))
+                && self::matchCronField($fields[1], (int) $t->format('G'))
+                && self::matchCronField($fields[2], (int) $t->format('j'))
+                && self::matchCronField($fields[3], (int) $t->format('n'))
+                && self::matchCronField($fields[4], (int) $t->format('w'));
+        }
+
+        $this->frequencyDescription = "cron({$expression})";
+
+        return $this;
+    }
+
+    /**
+     * Match a single cron field against the current calendar value.
+     *
+     * Supported patterns: `*` (any), `N` (exact), `*\/N` (every N steps from 0).
+     *
+     * @param string $field Cron field value.
+     * @param int    $value Current calendar value.
+     *
+     * @return bool
+     */
+    private static function matchCronField(string $field, int $value): bool
+    {
+        if ($field === '*') {
+            return true;
+        }
+
+        if (str_starts_with($field, '*/')) {
+            $n = (int) substr($field, 2);
+
+            return $n > 0 && $value % $n === 0;
+        }
+
+        return (int) $field === $value;
+    }
+
     // ── Name ─────────────────────────────────────────────────────────────────
 
     /**

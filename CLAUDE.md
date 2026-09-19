@@ -291,6 +291,7 @@ Fluent builder for a single scheduled job. Holds the command name, a due-predica
 | `daily()` | Due at 00:00 |
 | `weekly()` | Due on Sunday at 00:00 |
 | `monthly()` | Due on the 1st at 00:00 |
+| `cron(string $expression)` | Due when a five-field cron expression (`minute hour dom month dow`; `*`, `N`, `*\/N`) matches |
 | `withoutOverlapping(bool $enabled = true)` | Enables mutex-based skip when already running |
 | `isDue(DateTimeInterface $time)` | Evaluates the predicate against the given time |
 | `getMutexKey()` | Returns a stable `sha1`-derived key for the mutex |
@@ -338,7 +339,10 @@ Uses a `scheduler_locks` table (created via `CREATE TABLE IF NOT EXISTS` on cons
 - **`ext-redis` is not declared in `composer.json`** — Matches `ez-php/rate-limiter`, which also ships a `RedisDriver` without declaring the extension. Availability is checked at construction with `extension_loaded()` and raises `RuntimeException`, keeping the package installable without Redis.
 - **Expiry stored as a Unix timestamp `INTEGER`** — Avoids `DATETIME` dialect differences between MySQL and SQLite and keeps the comparison a plain integer compare.
 - **`ScheduleEntry` is mutable** — Frequency and overlap flags are set after construction via fluent methods (the caller receives the entry from `Scheduler::command()`). Immutability would require a builder pattern for no real benefit.
+- **`cron()` reimplements field matching rather than depending on `ez-php/queue`** — `ez-php/queue`'s `Scheduling\ScheduledTask::cron()` parses the same five-field subset (`*`, `N`, `*\/N`). Adding `ez-php/queue` as a dependency to get one private `matchField()` method would violate this package's "no framework dependency" constraint above and invert the module boundary (`scheduler` is the more fundamental package). The ~15-line matcher is copied, not shared, and kept in sync by hand if either grows richer cron syntax (ranges, lists, step-with-range) in the future.
+- **A malformed `cron()` expression is silently never-due, not an exception** — Consistent with every other frequency method: `isDue()` never throws, it fails closed. A five-field-count check is the only validation; unrecognized field syntax within a field falls through to the exact-match branch, which simply never matches a real calendar value.
 - **No `schedule:run` command in this package** — The framework already provides `ScheduleRunCommand`. Integrating with this module requires replacing `Scheduler` in the service provider and passing a suitable executor — documented in the README.
+- **`ez-php/queue`'s own scheduler is reconciled by registration, not by code.** `ez-php/queue` ships an independent, job-class-based scheduler (`Scheduling\Scheduler`/`ScheduledTask`, driven by `queue:schedule`) with cron matching but no overlap prevention. Rather than merging the two packages' data models (job-class-based vs. console-command-based — a real merge, out of scope), the documented bridge is to register `queue:schedule` itself as a single `withoutOverlapping()` entry here, so this package's mutex wraps the entire due-job-pushing step as one atomic unit. See README § "Reconciling with `ez-php/queue`'s own scheduler". No code changes to either package; this is pure integration glue, deliberately left undone in source (Test/Doku-scope, per the originating TODO item, was resolved as docs-only).
 
 ---
 
@@ -360,6 +364,5 @@ Uses a `scheduler_locks` table (created via `CREATE TABLE IF NOT EXISTS` on cons
 | `schedule:run` console command | `ez-php/framework` `ScheduleRunCommand` (already exists) |
 | Periodic/background purge of expired lock rows | Application layer — `DatabaseMutexWithExpiry` reclaims lazily per key on acquire; a global sweep of dead keys is a maintenance job |
 | Lock ownership tokens (release-only-if-still-mine) | Not implemented — `RedisMutex::release()` deletes the key unconditionally; a run that overruns its TTL could delete a lock another process has since taken |
-| Cron expression parsing (`* * * * *` syntax) | Out of scope — use predefined frequency methods |
 | Distributed locking beyond single-DB or single-FS scope | Application-level concern |
 | Job queuing / background processing | `ez-php/queue` |

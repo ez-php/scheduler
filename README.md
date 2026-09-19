@@ -56,8 +56,66 @@ All methods are fluent and return `ScheduleEntry` for chaining:
 | `daily()` | At `00:00` |
 | `weekly()` | On Sunday at `00:00` |
 | `monthly()` | On the 1st of the month at `00:00` |
+| `cron(string $expression)` | Matches a five-field cron expression (`minute hour dom month dow`) |
 
 An entry without a frequency set is **never due**.
+
+### Explicit cron expressions
+
+For schedules the predefined helpers don't cover, pass a standard five-field
+expression directly:
+
+```php
+$scheduler->command('reports:weekly')->cron('30 6 * * 1'); // 06:30 every Monday
+$scheduler->command('sync:external')->cron('*/15 * * * *'); // every 15 minutes
+```
+
+Supported field syntax per position: `*` (any), `N` (exact value), `*/N` (every
+N steps starting from 0). Ranges (`1-5`) and lists (`1,3,5`) are not supported —
+compose several `command()` calls, or use one of the predefined frequency
+methods, if you need those. A malformed expression (not exactly five
+space-separated fields) is simply never due, same as an entry with no
+frequency set at all.
+
+---
+
+## Reconciling with `ez-php/queue`'s own scheduler
+
+`ez-php/queue` ships an independent job-class-based scheduler
+(`Scheduling\Scheduler` + `Scheduling\ScheduledTask`, driven by the
+`queue:schedule` console command) with its own cron-expression matching but
+**no overlap prevention** — nothing stops two overlapping `queue:schedule`
+cron ticks from both matching the same due task and double-pushing the same
+job, if a tick ever runs long enough to still be executing when the next
+one starts.
+
+The two packages are not merged — `ez-php/queue`'s job-class model
+(`ScheduledTask::createJob()`) and this package's console-command model
+(`ScheduleEntry::getCommand()`) are different enough that unifying them
+would be a real merge, which is explicitly out of scope. Instead, register
+`queue:schedule` itself as a single `withoutOverlapping()` entry here, so
+this package's mutex protects the entire due-job-pushing step as one atomic
+unit, regardless of how many individual `ScheduledTask`s it evaluates
+internally:
+
+```php
+$scheduler->command('queue:schedule')->everyMinute()->withoutOverlapping();
+```
+
+Then point your system cron at **this** package's `schedule:run` only —
+remove any separate `* * * * * ez queue:schedule` cron line, since this
+entry now invokes it (mutex-guarded) on your behalf:
+
+```cron
+* * * * * php /var/www/html/ez schedule:run
+```
+
+This is pure integration glue: `queue:schedule`'s own cron-matching and job
+dispatch logic (`ez-php/queue`'s `Scheduling\Scheduler::dueJobs()`) is
+unchanged and still runs exactly as before — this package's mutex now simply
+wraps the single point where it used to be invoked directly by cron, closing
+the "queue:schedule takes over a minute, cron overlaps it" race window
+without either package depending on the other.
 
 ---
 
@@ -183,6 +241,7 @@ new Scheduler(?MutexInterface $mutex = null)
 | `daily(): self` | Due at `00:00` |
 | `weekly(): self` | Due on Sunday at `00:00` |
 | `monthly(): self` | Due on the 1st at `00:00` |
+| `cron(string $expression): self` | Due when the five-field cron expression matches |
 | `withoutOverlapping(bool $enabled = true): self` | Enable mutex-based skip |
 | `isDue(DateTimeInterface $time): bool` | Evaluate the frequency predicate |
 | `getCommand(): string` | Return the registered command name |
