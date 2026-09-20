@@ -408,16 +408,16 @@
         },
         {
             "name": "ez-php/cache",
-            "version": "2.4.10",
+            "version": "2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/cache.git",
-                "reference": "d2ed6f5720766e184cfbdf5486dcdcf561760713"
+                "reference": "185b1a059c1d54ac62b09b3862b64c0f2c2895e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/cache/zipball/d2ed6f5720766e184cfbdf5486dcdcf561760713",
-                "reference": "d2ed6f5720766e184cfbdf5486dcdcf561760713",
+                "url": "https://api.github.com/repos/ez-php/cache/zipball/185b1a059c1d54ac62b09b3862b64c0f2c2895e4",
+                "reference": "185b1a059c1d54ac62b09b3862b64c0f2c2895e4",
                 "shasum": ""
             },
             "require": {
@@ -462,20 +462,20 @@
                 "issues": "https://github.com/ez-php/cache/issues",
                 "source": "https://github.com/ez-php/cache"
             },
-            "time": "2026-09-19T23:40:00+00:00"
+            "time": "2026-09-20T01:19:25+00:00"
         },
         {
             "name": "ez-php/console",
-            "version": "2.4.10",
+            "version": "2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/console.git",
-                "reference": "74045cdfb35c0af998f575a39367d35a360176f7"
+                "reference": "52ba2a450e0bb4eaf2ff7d838b10f57557a6ee15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/console/zipball/74045cdfb35c0af998f575a39367d35a360176f7",
-                "reference": "74045cdfb35c0af998f575a39367d35a360176f7",
+                "url": "https://api.github.com/repos/ez-php/console/zipball/52ba2a450e0bb4eaf2ff7d838b10f57557a6ee15",
+                "reference": "52ba2a450e0bb4eaf2ff7d838b10f57557a6ee15",
                 "shasum": ""
             },
             "require": {
@@ -519,20 +519,20 @@
                 "issues": "https://github.com/ez-php/console/issues",
                 "source": "https://github.com/ez-php/console"
             },
-            "time": "2026-09-19T23:39:54+00:00"
+            "time": "2026-09-20T01:19:22+00:00"
         },
         {
             "name": "ez-php/contracts",
-            "version": "2.4.10",
+            "version": "2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/contracts.git",
-                "reference": "ea1e4873893bb9261a7abeae090d945f20c12b71"
+                "reference": "c9be9df00a8bf7f3026f73f63b5b745565bbb5fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/contracts/zipball/ea1e4873893bb9261a7abeae090d945f20c12b71",
-                "reference": "ea1e4873893bb9261a7abeae090d945f20c12b71",
+                "url": "https://api.github.com/repos/ez-php/contracts/zipball/c9be9df00a8bf7f3026f73f63b5b745565bbb5fd",
+                "reference": "c9be9df00a8bf7f3026f73f63b5b745565bbb5fd",
                 "shasum": ""
             },
             "require": {
@@ -578,20 +578,20 @@
                 "issues": "https://github.com/ez-php/contracts/issues",
                 "source": "https://github.com/ez-php/contracts"
             },
-            "time": "2026-09-19T23:39:46+00:00"
+            "time": "2026-09-20T01:19:19+00:00"
         },
         {
             "name": "ez-php/docker",
-            "version": "2.4.10",
+            "version": "2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/docker.git",
-                "reference": "b513a2c4701ded41c5bb44e8bc413a7cee6495b7"
+                "reference": "dcda4bedd2976d3ed5d310ab0924d4d646ad5cff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/docker/zipball/b513a2c4701ded41c5bb44e8bc413a7cee6495b7",
-                "reference": "b513a2c4701ded41c5bb44e8bc413a7cee6495b7",
+                "url": "https://api.github.com/repos/ez-php/docker/zipball/dcda4bedd2976d3ed5d310ab0924d4d646ad5cff",
+                "reference": "dcda4bedd2976d3ed5d310ab0924d4d646ad5cff",
                 "shasum": ""
             },
             "require": {
@@ -612,22 +612,22 @@
             "description": "Docker base image source and scaffolding stubs for ez-php modules and projects",
             "support": {
                 "issues": "https://github.com/ez-php/docker/issues",
-                "source": "https://github.com/ez-php/docker/tree/v2.4.10"
+                "source": "https://github.com/ez-php/docker/tree/v2.4.11"
             },
-            "time": "2026-09-19T23:39:57+00:00"
+            "time": "2026-09-20T01:19:23+00:00"
         },
         {
             "name": "ez-php/dotenv",
-            "version": "2.4.10",
+            "version": "2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/dotenv.git",
-                "reference": "2475519c1db32c8ae2ee2aae2d3e58b9454a7bee"
+                "reference": "fe098951ef9fecb48642372e59d98a4081cf9c5b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/dotenv/zipball/2475519c1db32c8ae2ee2aae2d3e58b9454a7bee",
-                "reference": "2475519c1db32c8ae2ee2aae2d3e58b9454a7bee",
+                "url": "https://api.github.com/repos/ez-php/dotenv/zipball/fe098951ef9fecb48642372e59d98a4081cf9c5b",
+                "reference": "fe098951ef9fecb48642372e59d98a4081cf9c5b",
                 "shasum": ""
             },
             "require": {
@@ -671,20 +671,20 @@
                 "issues": "https://github.com/ez-php/dotenv/issues",
                 "source": "https://github.com/ez-php/dotenv"
             },
-            "time": "2026-09-19T23:39:57+00:00"
+            "time": "2026-09-20T01:19:24+00:00"
         },
         {
             "name": "ez-php/framework",
-            "version": "2.4.10",
+            "version": "2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/framework.git",
-                "reference": "9cdcdb8e64b9cfe5816dcb0e3dc68b7d60ed3d3b"
+                "reference": "6541c9ff84c48b69c0d7372568751a4d2909ae39"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/framework/zipball/9cdcdb8e64b9cfe5816dcb0e3dc68b7d60ed3d3b",
-                "reference": "9cdcdb8e64b9cfe5816dcb0e3dc68b7d60ed3d3b",
+                "url": "https://api.github.com/repos/ez-php/framework/zipball/6541c9ff84c48b69c0d7372568751a4d2909ae39",
+                "reference": "6541c9ff84c48b69c0d7372568751a4d2909ae39",
                 "shasum": ""
             },
             "require": {
@@ -736,20 +736,20 @@
                 "issues": "https://github.com/ez-php/framework/issues",
                 "source": "https://github.com/ez-php/framework"
             },
-            "time": "2026-09-19T23:40:06+00:00"
+            "time": "2026-09-20T01:19:28+00:00"
         },
         {
             "name": "ez-php/http",
-            "version": "2.4.10",
+            "version": "2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/http.git",
-                "reference": "fdd70bf0774b30fa3e65c5a50da8d794a0934368"
+                "reference": "8f7a19e5edfd2176bc5cb236d7648182f39f56f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/http/zipball/fdd70bf0774b30fa3e65c5a50da8d794a0934368",
-                "reference": "fdd70bf0774b30fa3e65c5a50da8d794a0934368",
+                "url": "https://api.github.com/repos/ez-php/http/zipball/8f7a19e5edfd2176bc5cb236d7648182f39f56f4",
+                "reference": "8f7a19e5edfd2176bc5cb236d7648182f39f56f4",
                 "shasum": ""
             },
             "require": {
@@ -793,20 +793,20 @@
                 "issues": "https://github.com/ez-php/http/issues",
                 "source": "https://github.com/ez-php/http"
             },
-            "time": "2026-09-19T23:40:01+00:00"
+            "time": "2026-09-20T01:19:27+00:00"
         },
         {
             "name": "ez-php/i18n",
-            "version": "2.4.10",
+            "version": "2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/i18n.git",
-                "reference": "d261ef282cfe9ae60d306caced8c29c31bc1d02a"
+                "reference": "9d638c29a2e7822473060424311cce995f5423a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/i18n/zipball/d261ef282cfe9ae60d306caced8c29c31bc1d02a",
-                "reference": "d261ef282cfe9ae60d306caced8c29c31bc1d02a",
+                "url": "https://api.github.com/repos/ez-php/i18n/zipball/9d638c29a2e7822473060424311cce995f5423a5",
+                "reference": "9d638c29a2e7822473060424311cce995f5423a5",
                 "shasum": ""
             },
             "require": {
@@ -853,20 +853,20 @@
                 "issues": "https://github.com/ez-php/i18n/issues",
                 "source": "https://github.com/ez-php/i18n"
             },
-            "time": "2026-09-19T23:40:03+00:00"
+            "time": "2026-09-20T01:19:26+00:00"
         },
         {
             "name": "ez-php/orm",
-            "version": "2.4.10",
+            "version": "2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/orm.git",
-                "reference": "d34fb252ff557f6d20c3a7448f4cdca6c57866fb"
+                "reference": "d1d601e0ef4ca7bddbbe47e2d8c007cb818e0042"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/orm/zipball/d34fb252ff557f6d20c3a7448f4cdca6c57866fb",
-                "reference": "d34fb252ff557f6d20c3a7448f4cdca6c57866fb",
+                "url": "https://api.github.com/repos/ez-php/orm/zipball/d1d601e0ef4ca7bddbbe47e2d8c007cb818e0042",
+                "reference": "d1d601e0ef4ca7bddbbe47e2d8c007cb818e0042",
                 "shasum": ""
             },
             "require": {
@@ -922,20 +922,20 @@
                 "issues": "https://github.com/ez-php/orm/issues",
                 "source": "https://github.com/ez-php/orm"
             },
-            "time": "2026-09-19T23:40:04+00:00"
+            "time": "2026-09-20T01:19:28+00:00"
         },
         {
             "name": "ez-php/testing",
-            "version": "2.4.10",
+            "version": "2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/testing.git",
-                "reference": "25873742aeed1ae29cf717ceff7fcd03b0d35238"
+                "reference": "25d134c288d738f914d1188e27a89abd15e950bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/testing/zipball/25873742aeed1ae29cf717ceff7fcd03b0d35238",
-                "reference": "25873742aeed1ae29cf717ceff7fcd03b0d35238",
+                "url": "https://api.github.com/repos/ez-php/testing/zipball/25d134c288d738f914d1188e27a89abd15e950bd",
+                "reference": "25d134c288d738f914d1188e27a89abd15e950bd",
                 "shasum": ""
             },
             "require": {
@@ -993,20 +993,20 @@
                 "issues": "https://github.com/ez-php/testing/issues",
                 "source": "https://github.com/ez-php/testing"
             },
-            "time": "2026-09-19T23:39:50+00:00"
+            "time": "2026-09-20T01:19:22+00:00"
         },
         {
             "name": "ez-php/testing-application",
-            "version": "2.4.10",
+            "version": "2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/testing-application.git",
-                "reference": "4ea505a61b502ca5f7c23d0b1432d56900c21afc"
+                "reference": "f00c7292f033d7e2f89740a3355054c3665ee35a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/testing-application/zipball/4ea505a61b502ca5f7c23d0b1432d56900c21afc",
-                "reference": "4ea505a61b502ca5f7c23d0b1432d56900c21afc",
+                "url": "https://api.github.com/repos/ez-php/testing-application/zipball/f00c7292f033d7e2f89740a3355054c3665ee35a",
+                "reference": "f00c7292f033d7e2f89740a3355054c3665ee35a",
                 "shasum": ""
             },
             "require": {
@@ -1055,20 +1055,20 @@
                 "issues": "https://github.com/ez-php/testing-application/issues",
                 "source": "https://github.com/ez-php/testing-application"
             },
-            "time": "2026-09-19T23:39:34+00:00"
+            "time": "2026-09-20T01:19:13+00:00"
         },
         {
             "name": "ez-php/validation",
-            "version": "2.4.10",
+            "version": "2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/validation.git",
-                "reference": "15efd1ee9a4121260d3d85730812a317c54d551e"
+                "reference": "6ea80e3ec228163c55ebf1c87c1b18cd87658dfe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/validation/zipball/15efd1ee9a4121260d3d85730812a317c54d551e",
-                "reference": "15efd1ee9a4121260d3d85730812a317c54d551e",
+                "url": "https://api.github.com/repos/ez-php/validation/zipball/6ea80e3ec228163c55ebf1c87c1b18cd87658dfe",
+                "reference": "6ea80e3ec228163c55ebf1c87c1b18cd87658dfe",
                 "shasum": ""
             },
             "require": {
@@ -1117,7 +1117,7 @@
                 "issues": "https://github.com/ez-php/validation/issues",
                 "source": "https://github.com/ez-php/validation"
             },
-            "time": "2026-09-19T23:39:44+00:00"
+            "time": "2026-09-20T01:19:17+00:00"
         },
         {
             "name": "fidry/cpu-core-counter",
