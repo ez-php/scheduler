@@ -94,12 +94,6 @@ final class SchedulerRunCommand implements CommandInterface
 
         $console = $this->container->make(Console::class);
 
-        if (!$console instanceof Console) {
-            Output::error('scheduler:run: the container did not return an ' . Console::class . '.');
-
-            return 1;
-        }
-
         try {
             $this->scheduler->run($now, static function (string $command) use ($console): void {
                 Output::info('Running: ' . $command);
