@@ -241,7 +241,7 @@ Only set a port for services the module actually uses. Modules without external 
 
 > The `MEILISEARCH_PORT` column is the **host** port. Inside a Compose network the service is always reachable at `http://meilisearch:7700` regardless of the host mapping — only publish-side ports need to be unique.
 
-> The "Redis host port" column is likewise the **host**-published port. `ez-php/cache`, `ez-php/queue`, and `ez-php/rate-limiter` map it through a separate `REDIS_HOST_PORT` env var in `docker-compose.yml`, keeping `REDIS_PORT` fixed at `6379` for in-container connections (the app container always reaches Redis at `redis:6379` over the Compose network, regardless of the host mapping) — the root project and the `ez-php/` application template are the two exceptions, since both have no host/container split and use `REDIS_PORT` for both (the template's other in-container Redis settings — `CACHE_REDIS_PORT`, `QUEUE_REDIS_PORT`, `RATE_LIMITER_REDIS_PORT` — stay fixed at `6379` regardless, same as every other module).
+> The "Redis host port" column is likewise the **host**-published port. `ez-php/cache`, `ez-php/queue`, and `ez-php/rate-limiter` map it through a separate `REDIS_HOST_PORT` env var in `docker-compose.yml`, keeping `REDIS_PORT` fixed at `6379` for in-container connections (the app container always reaches Redis at `redis:6379` over the Compose network, regardless of the host mapping) — the root project and the `ez-php/` application template are the two exceptions, since both have no host/container split and use `REDIS_PORT` for both (the template's other in-container Redis settings — `CACHE_REDIS_PORT`, `QUEUE_REDIS_PORT`, `RATE_LIMITER_REDIS_PORT`, `HEALTH_REDIS_PORT` — stay fixed at `6379` regardless, same as every other module).
 
 > This table tracks only MySQL, Redis, and Meilisearch ports — the three services shared across multiple modules where a collision is otherwise easy to introduce. Mailpit is the one other service with published host ports: SMTP `1025` and web UI `8025`. `ez-php/mail` maps them through `MAILPIT_SMTP_HOST_PORT`/`MAILPIT_API_HOST_PORT` in `modules/mail/docker-compose.yml` (mirroring the `*_HOST_PORT` pattern above, documented in `modules/mail/.env.example`); the root project and the `ez-php/` template each run their own Mailpit on the same defaults (`MAIL_PORT`/`MAIL_WEB_PORT`), so **these three stacks cannot run at the same time** without overriding those variables. It isn't a table column because no module beyond those three runs Mailpit — but a new module adding its own single-use service's ports should likewise parameterize them and document the defaults in its own `.env.example` rather than adding a column here.
 
@@ -267,6 +267,8 @@ src/
 ├── MutexInterface.php          — contract: acquire(key): bool, release(key): void
 ├── ScheduleEntry.php           — fluent builder: frequency methods + withoutOverlapping()
 ├── Scheduler.php               — registry + dueEntries() + run(callable $executor)
+├── Console/
+│   └── SchedulerRunCommand.php — `scheduler:run`: runs due entries through the application Console (opt-in via registerCommand)
 └── Mutex/
     ├── FileMutex.php               — flock()-based mutex; lock files stored in a configurable directory
     ├── DatabaseMutex.php           — PDO INSERT/DELETE-based mutex; auto-creates scheduler_locks table
@@ -277,6 +279,11 @@ tests/
 ├── TestCase.php                — base PHPUnit test case
 ├── ScheduleEntryTest.php       — covers ScheduleEntry: all frequency methods, withoutOverlapping, mutex key
 ├── SchedulerTest.php           — covers Scheduler: registration, dueEntries, run, mutex acquire/release/skip
+├── Console/
+│   └── SchedulerRunCommandTest.php — bootstraps a real Application (SQLite config) and runs `scheduler:run` through its Console
+├── Support/
+│   ├── SchedulerProbeCommand.php   — console command recording its arguments; `--fail` exits 1
+│   └── SchedulerProbeProvider.php  — binds a Scheduler with everyMinute() entries from a static list
 └── Mutex/
     ├── FileMutexTest.php       — covers FileMutex: acquire, release, double-lock, directory creation
     ├── DatabaseMutexTest.php   — covers DatabaseMutex: acquire, release, duplicate key, table creation (SQLite)
@@ -309,7 +316,7 @@ Fluent builder for a single scheduled job. Holds the command name, a due-predica
 
 ### Scheduler (`src/Scheduler.php`)
 
-Registry and runner. Accepts an optional `MutexInterface`. The `run()` method iterates due entries and calls the provided executor callable — in an ez-php application, the executor would call `Console::call($commandName)`.
+Registry and runner. Accepts an optional `MutexInterface`. The `run()` method iterates due entries and calls the provided executor callable — in an ez-php application `SchedulerRunCommand` supplies an executor that splits the entry on whitespace and calls `Console::run(['ez', ...])`, throwing on a non-zero exit.
 
 Mutex flow in `run()`:
 1. If `shouldSkipIfOverlapping()` and no mutex → throw `SchedulerException`
@@ -334,7 +341,7 @@ Uses a `scheduler_locks` table (created via `CREATE TABLE IF NOT EXISTS` on cons
 
 ## Design Decisions and Constraints
 
-- **No framework dependency** — `ez-php/scheduler` requires only `php: ^8.5`. It accepts a plain `PDO` instance for `DatabaseMutex`; no `ez-php/framework` import is needed. The executor callable passed to `run()` decouples the scheduler from `ez-php/console`.
+- **No framework dependency** — `ez-php/scheduler` requires `ez-php/console` (for `SchedulerRunCommand`) and `ez-php/contracts` (for `ContainerInterface`), never `ez-php/framework`. It accepts a plain `PDO` instance for `DatabaseMutex`. `Scheduler` itself still only takes an executor callable, so it runs outside an ez-php application too.
 - **Callable executor in `run()`** — Rather than injecting a `Console` instance, `run()` accepts `callable(string): void`. This keeps the scheduler standalone and testable with a simple closure.
 - **`MutexInterface` throws `SchedulerException` on misconfiguration, not on lock fail** — A missing mutex when `withoutOverlapping()` is requested is a programmer error (fail-fast). A failed lock acquire is a normal runtime event (silent skip).
 - **`FileMutex` uses `flock()` not `sem_get()`** — `flock()` is universally available without the `sysvsem` extension. The lock is tied to the file handle, so the process dying automatically releases it (no stale lock cleanup needed).
@@ -348,9 +355,11 @@ Uses a `scheduler_locks` table (created via `CREATE TABLE IF NOT EXISTS` on cons
 - **`ext-redis` is not declared in `composer.json`** — Matches `ez-php/rate-limiter`, which also ships a `RedisDriver` without declaring the extension. Availability is checked at construction with `extension_loaded()` and raises `RuntimeException`, keeping the package installable without Redis.
 - **Expiry stored as a Unix timestamp `INTEGER`** — Avoids `DATETIME` dialect differences between MySQL and SQLite and keeps the comparison a plain integer compare.
 - **`ScheduleEntry` is mutable** — Frequency and overlap flags are set after construction via fluent methods (the caller receives the entry from `Scheduler::command()`). Immutability would require a builder pattern for no real benefit.
-- **`cron()` reimplements field matching rather than depending on `ez-php/queue`** — `ez-php/queue`'s `Scheduling\ScheduledTask::cron()` parses the same five-field subset (`*`, `N`, `*\/N`). Adding `ez-php/queue` as a dependency to get one private `matchField()` method would violate this package's "no framework dependency" constraint above and invert the module boundary (`scheduler` is the more fundamental package). The ~15-line matcher is copied, not shared, and kept in sync by hand if either grows richer cron syntax (ranges, lists, step-with-range) in the future.
+- **`cron()` delegates to `ez-php/support`'s `CronExpression`** — `ez-php/queue`'s `Scheduling\ScheduledTask` parses the same five-field subset (`*`, `N`, `*\/N`), and the two used to keep identical, hand-synced private matchers. Both now call `EzPhp\Support\CronExpression::isDue()`: `ez-php/support` has zero dependencies, so neither package takes on the other (or the framework) to share it. Richer cron syntax (ranges, lists) goes there, once, for both. The framework's own `Console\Schedule\ScheduledCommand` has only fixed frequencies (no cron fields) and cannot depend on a module, so it is unaffected.
 - **A malformed `cron()` expression is silently never-due, not an exception** — Consistent with every other frequency method: `isDue()` never throws, it fails closed. A five-field-count check is the only validation; unrecognized field syntax within a field falls through to the exact-match branch, which simply never matches a real calendar value.
-- **No `schedule:run` command in this package** — The framework already provides `ScheduleRunCommand`. Integrating with this module requires replacing `Scheduler` in the service provider and passing a suitable executor — documented in the README.
+- **Own `scheduler:run` command, not a replacement for `schedule:run`** — The framework's `ScheduleRunCommand` type-hints its own `final EzPhp\Console\Schedule\Scheduler`, so this package's `Scheduler` cannot be swapped in. `SchedulerRunCommand` is therefore this package's own entry point, deliberately named `scheduler:run` so both can be registered without a name clash. It is opt-in (`$app->registerCommand()`), like `ez-php/auth`'s commands; the application binds a configured `Scheduler`.
+- **`SchedulerRunCommand` resolves the Console lazily from `ContainerInterface`** — The framework constructs user commands while building `Console` itself, so injecting `Console` would be a circular dependency. The framework's `ScheduleRunCommand` defers it through a factory closure for the same reason; a closure is not autowirable for a class registered by name, so this command takes the container instead and resolves `Console` only when an entry is due.
+- **First failure stops the run** — `Scheduler::run()` logs and rethrows an executor exception, so later entries in the same tick are skipped. `SchedulerRunCommand` turns a non-zero exit into a `SchedulerException`, prints it and exits `1` so cron/monitoring sees the failure.
 - **`ez-php/queue`'s own scheduler is reconciled by registration, not by code.** `ez-php/queue` ships an independent, job-class-based scheduler (`Scheduling\Scheduler`/`ScheduledTask`, driven by `queue:schedule`) with cron matching but no overlap prevention. Rather than merging the two packages' data models (job-class-based vs. console-command-based — a real merge, out of scope), the documented bridge is to register `queue:schedule` itself as a single `withoutOverlapping()` entry here, so this package's mutex wraps the entire due-job-pushing step as one atomic unit. See README § "Reconciling with `ez-php/queue`'s own scheduler". No code changes to either package; this is pure integration glue, deliberately left undone in source (Test/Doku-scope, per the originating TODO item, was resolved as docs-only).
 
 ---
@@ -370,7 +379,7 @@ Uses a `scheduler_locks` table (created via `CREATE TABLE IF NOT EXISTS` on cons
 
 | Concern | Where it belongs |
 |---------|-----------------|
-| `schedule:run` console command | `ez-php/framework` `ScheduleRunCommand` (already exists) |
+| The framework's `schedule:run` / its `Console\Schedule\Scheduler` | `ez-php/framework` (separate, mutex-less scheduler; this package ships `scheduler:run` instead) |
 | Periodic/background purge of expired lock rows | Application layer — `DatabaseMutexWithExpiry` reclaims lazily per key on acquire; a global sweep of dead keys is a maintenance job |
 | Lock ownership tokens (release-only-if-still-mine) | Not implemented — `RedisMutex::release()` deletes the key unconditionally; a run that overruns its TTL could delete a lock another process has since taken |
 | Distributed locking beyond single-DB or single-FS scope | Application-level concern |

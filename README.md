@@ -14,31 +14,49 @@ composer require ez-php/scheduler
 
 ## Quick Start
 
-Create a schedule definition (e.g. `app/schedule.php`):
+Bind a configured `Scheduler` in a service provider's `register()`:
 
 ```php
-use EzPhp\Scheduler\Mutex\DatabaseMutex;
+use EzPhp\Scheduler\Mutex\FileMutex;
 use EzPhp\Scheduler\Scheduler;
 
-$pdo = $app->make(\PDO::class); // or any PDO instance
-$scheduler = new Scheduler(new DatabaseMutex($pdo));
+$this->app->bind(Scheduler::class, function (): Scheduler {
+    $scheduler = new Scheduler(new FileMutex(sys_get_temp_dir() . '/ez-schedule-locks'));
 
-$scheduler->command('queue:work')->everyMinute()->withoutOverlapping();
-$scheduler->command('cache:prune')->hourly();
-$scheduler->command('reports:generate')->daily();
+    $scheduler->command('queue:work --max-jobs=100')->everyMinute()->withoutOverlapping();
+    $scheduler->command('cache:prune')->hourly();
+    $scheduler->command('reports:generate')->daily();
+
+    return $scheduler;
+});
 ```
 
-Run from a cron entry (once per minute):
-
-```cron
-* * * * * php /var/www/html/ez schedule:run
-```
-
-In the `schedule:run` command, pass a callable executor that dispatches to your console:
+Register the `scheduler:run` command before bootstrap (e.g. in `public/index.php` and `ez`):
 
 ```php
-$scheduler->run(new DateTimeImmutable(), static function (string $command) use ($console): void {
-    $console->call($command);
+$app->registerCommand(\EzPhp\Scheduler\Console\SchedulerRunCommand::class);
+```
+
+Run it from a cron entry, once per minute:
+
+```cron
+* * * * * php /var/www/html/ez scheduler:run
+```
+
+`scheduler:run` runs every due entry through the application's console — the entry
+string is split on whitespace, so `'queue:work --max-jobs=100'` calls `queue:work` with
+`--max-jobs=100` — honouring `withoutOverlapping()` and the optional logger. It stops at
+the first entry that fails (non-zero exit or exception) and exits `1`.
+
+It is deliberately named `scheduler:run`: the framework's own `schedule:run` drives the
+framework's simpler `EzPhp\Console\Schedule\Scheduler` (no overlap prevention, no
+`cron()`), not this package's. Use one or the other, not both from cron.
+
+Outside an ez-php application, call `run()` with your own executor:
+
+```php
+$scheduler->run(new DateTimeImmutable(), static function (string $command): void {
+    // dispatch $command however your application runs commands; throw on failure
 });
 ```
 
@@ -102,12 +120,12 @@ internally:
 $scheduler->command('queue:schedule')->everyMinute()->withoutOverlapping();
 ```
 
-Then point your system cron at **this** package's `schedule:run` only —
+Then point your system cron at **this** package's `scheduler:run` only —
 remove any separate `* * * * * ez queue:schedule` cron line, since this
 entry now invokes it (mutex-guarded) on your behalf:
 
 ```cron
-* * * * * php /var/www/html/ez schedule:run
+* * * * * php /var/www/html/ez scheduler:run
 ```
 
 This is pure integration glue: `queue:schedule`'s own cron-matching and job

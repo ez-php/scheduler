@@ -4,8 +4,241 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8029f000176d92f56f7908ed418c1385",
-    "packages": [],
+    "content-hash": "bbe8c2fcd7bfb9ea9bd6733fd3aa7632",
+    "packages": [
+        {
+            "name": "ez-php/console",
+            "version": "2.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/console.git",
+                "reference": "638c3a3aeab35e5635333279245fc5a00c1c4fde"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/console/zipball/638c3a3aeab35e5635333279245fc5a00c1c4fde",
+                "reference": "638c3a3aeab35e5635333279245fc5a00c1c4fde",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "^2.0",
+                "ez-php/testing-application": "^2.0",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Console\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "Lightweight console infrastructure for PHP — command dispatcher, argument parser, and colored output helpers",
+            "homepage": "https://github.com/ez-php/console",
+            "keywords": [
+                "cli",
+                "command",
+                "console",
+                "php",
+                "terminal"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/console/issues",
+                "source": "https://github.com/ez-php/console"
+            },
+            "time": "2026-09-25T18:37:24+00:00"
+        },
+        {
+            "name": "ez-php/contracts",
+            "version": "2.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/contracts.git",
+                "reference": "54c30d6bc6094264da7a2d223cfaad1422b49e93"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/contracts/zipball/54c30d6bc6094264da7a2d223cfaad1422b49e93",
+                "reference": "54c30d6bc6094264da7a2d223cfaad1422b49e93",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "ez-php/http": "^2.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "^2.0",
+                "ez-php/testing-application": "^2.0",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Contracts\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "Shared interfaces and abstract base classes for the ez-php framework — zero framework coupling for standalone modules",
+            "homepage": "https://github.com/ez-php/contracts",
+            "keywords": [
+                "contracts",
+                "dependency-injection",
+                "ez-php",
+                "interfaces",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/contracts/issues",
+                "source": "https://github.com/ez-php/contracts"
+            },
+            "time": "2026-09-25T18:37:23+00:00"
+        },
+        {
+            "name": "ez-php/http",
+            "version": "2.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/http.git",
+                "reference": "e885e605a1ac880cbc52dfea838ac7e343ebcdf8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/http/zipball/e885e605a1ac880cbc52dfea838ac7e343ebcdf8",
+                "reference": "e885e605a1ac880cbc52dfea838ac7e343ebcdf8",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "^2.0",
+                "ez-php/testing-application": "^2.0",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Http\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "HTTP message objects for the ez-php framework — immutable Request, Response, RequestFactory, and ResponseEmitter. Zero dependencies.",
+            "homepage": "https://github.com/ez-php/http",
+            "keywords": [
+                "http",
+                "php",
+                "psr",
+                "request",
+                "response"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/http/issues",
+                "source": "https://github.com/ez-php/http"
+            },
+            "time": "2026-09-25T18:37:33+00:00"
+        },
+        {
+            "name": "ez-php/support",
+            "version": "2.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ez-php/support.git",
+                "reference": "b7c2e2c439f828619022fa536fca8ed5f0ab3e89"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ez-php/support/zipball/b7c2e2c439f828619022fa536fca8ed5f0ab3e89",
+                "reference": "b7c2e2c439f828619022fa536fca8ed5f0ab3e89",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "ez-php/docker": "^2.0",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^13.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EzPhp\\Support\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Uretschnig",
+                    "email": "andreas.uretschnig@gmail.com"
+                }
+            ],
+            "description": "General-purpose utility classes for the ez-php ecosystem — Range, WeightedRandom, TimeProbability, DailyQuota",
+            "homepage": "https://github.com/ez-php/support",
+            "keywords": [
+                "daily-quota",
+                "ez-php",
+                "php",
+                "range",
+                "support",
+                "time-probability",
+                "utilities",
+                "weighted-random"
+            ],
+            "support": {
+                "issues": "https://github.com/ez-php/support/issues",
+                "source": "https://github.com/ez-php/support"
+            },
+            "time": "2026-09-25T18:37:27+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "clue/ndjson-react",
@@ -465,122 +698,6 @@
             "time": "2026-09-25T18:37:31+00:00"
         },
         {
-            "name": "ez-php/console",
-            "version": "2.5.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ez-php/console.git",
-                "reference": "638c3a3aeab35e5635333279245fc5a00c1c4fde"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/console/zipball/638c3a3aeab35e5635333279245fc5a00c1c4fde",
-                "reference": "638c3a3aeab35e5635333279245fc5a00c1c4fde",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.5"
-            },
-            "require-dev": {
-                "ez-php/docker": "^2.0",
-                "ez-php/testing-application": "^2.0",
-                "friendsofphp/php-cs-fixer": "^3.94",
-                "phpstan/phpstan": "^2.1",
-                "phpstan/phpstan-deprecation-rules": "^2.0",
-                "phpstan/phpstan-strict-rules": "^2.0",
-                "phpunit/phpunit": "^13.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "EzPhp\\Console\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Andreas Uretschnig",
-                    "email": "andreas.uretschnig@gmail.com"
-                }
-            ],
-            "description": "Lightweight console infrastructure for PHP — command dispatcher, argument parser, and colored output helpers",
-            "homepage": "https://github.com/ez-php/console",
-            "keywords": [
-                "cli",
-                "command",
-                "console",
-                "php",
-                "terminal"
-            ],
-            "support": {
-                "issues": "https://github.com/ez-php/console/issues",
-                "source": "https://github.com/ez-php/console"
-            },
-            "time": "2026-09-25T18:37:24+00:00"
-        },
-        {
-            "name": "ez-php/contracts",
-            "version": "2.5.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ez-php/contracts.git",
-                "reference": "54c30d6bc6094264da7a2d223cfaad1422b49e93"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/contracts/zipball/54c30d6bc6094264da7a2d223cfaad1422b49e93",
-                "reference": "54c30d6bc6094264da7a2d223cfaad1422b49e93",
-                "shasum": ""
-            },
-            "require": {
-                "ext-pdo": "*",
-                "ez-php/http": "^2.0",
-                "php": "^8.5"
-            },
-            "require-dev": {
-                "ez-php/docker": "^2.0",
-                "ez-php/testing-application": "^2.0",
-                "friendsofphp/php-cs-fixer": "^3.94",
-                "phpstan/phpstan": "^2.1",
-                "phpstan/phpstan-deprecation-rules": "^2.0",
-                "phpstan/phpstan-strict-rules": "^2.0",
-                "phpunit/phpunit": "^13.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "EzPhp\\Contracts\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Andreas Uretschnig",
-                    "email": "andreas.uretschnig@gmail.com"
-                }
-            ],
-            "description": "Shared interfaces and abstract base classes for the ez-php framework — zero framework coupling for standalone modules",
-            "homepage": "https://github.com/ez-php/contracts",
-            "keywords": [
-                "contracts",
-                "dependency-injection",
-                "ez-php",
-                "interfaces",
-                "php"
-            ],
-            "support": {
-                "issues": "https://github.com/ez-php/contracts/issues",
-                "source": "https://github.com/ez-php/contracts"
-            },
-            "time": "2026-09-25T18:37:23+00:00"
-        },
-        {
             "name": "ez-php/docker",
             "version": "2.5.1",
             "source": {
@@ -737,63 +854,6 @@
                 "source": "https://github.com/ez-php/framework"
             },
             "time": "2026-09-25T18:54:04+00:00"
-        },
-        {
-            "name": "ez-php/http",
-            "version": "2.5.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ez-php/http.git",
-                "reference": "e885e605a1ac880cbc52dfea838ac7e343ebcdf8"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/http/zipball/e885e605a1ac880cbc52dfea838ac7e343ebcdf8",
-                "reference": "e885e605a1ac880cbc52dfea838ac7e343ebcdf8",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.5"
-            },
-            "require-dev": {
-                "ez-php/docker": "^2.0",
-                "ez-php/testing-application": "^2.0",
-                "friendsofphp/php-cs-fixer": "^3.94",
-                "phpstan/phpstan": "^2.1",
-                "phpstan/phpstan-deprecation-rules": "^2.0",
-                "phpstan/phpstan-strict-rules": "^2.0",
-                "phpunit/phpunit": "^13.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "EzPhp\\Http\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Andreas Uretschnig",
-                    "email": "andreas.uretschnig@gmail.com"
-                }
-            ],
-            "description": "HTTP message objects for the ez-php framework — immutable Request, Response, RequestFactory, and ResponseEmitter. Zero dependencies.",
-            "homepage": "https://github.com/ez-php/http",
-            "keywords": [
-                "http",
-                "php",
-                "psr",
-                "request",
-                "response"
-            ],
-            "support": {
-                "issues": "https://github.com/ez-php/http/issues",
-                "source": "https://github.com/ez-php/http"
-            },
-            "time": "2026-09-25T18:37:33+00:00"
         },
         {
             "name": "ez-php/i18n",

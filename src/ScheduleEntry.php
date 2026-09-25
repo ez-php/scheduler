@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EzPhp\Scheduler;
 
 use DateTimeInterface;
+use EzPhp\Support\CronExpression;
 
 /**
  * Class ScheduleEntry
@@ -143,46 +144,11 @@ final class ScheduleEntry
      */
     public function cron(string $expression): self
     {
-        $fields = explode(' ', $expression);
-
-        if (count($fields) !== 5) {
-            $this->duePredicate = static fn (DateTimeInterface $t): bool => false;
-        } else {
-            $this->duePredicate = static fn (DateTimeInterface $t): bool => self::matchCronField($fields[0], (int) $t->format('i'))
-                && self::matchCronField($fields[1], (int) $t->format('G'))
-                && self::matchCronField($fields[2], (int) $t->format('j'))
-                && self::matchCronField($fields[3], (int) $t->format('n'))
-                && self::matchCronField($fields[4], (int) $t->format('w'));
-        }
+        $this->duePredicate = static fn (DateTimeInterface $t): bool => CronExpression::isDue($expression, $t);
 
         $this->frequencyDescription = "cron({$expression})";
 
         return $this;
-    }
-
-    /**
-     * Match a single cron field against the current calendar value.
-     *
-     * Supported patterns: `*` (any), `N` (exact), `*\/N` (every N steps from 0).
-     *
-     * @param string $field Cron field value.
-     * @param int    $value Current calendar value.
-     *
-     * @return bool
-     */
-    private static function matchCronField(string $field, int $value): bool
-    {
-        if ($field === '*') {
-            return true;
-        }
-
-        if (str_starts_with($field, '*/')) {
-            $n = (int) substr($field, 2);
-
-            return $n > 0 && $value % $n === 0;
-        }
-
-        return (int) $field === $value;
     }
 
     // ── Name ─────────────────────────────────────────────────────────────────

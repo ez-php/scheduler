@@ -22,7 +22,13 @@
         "source": "https://github.com/ez-php/scheduler"
     },
     "require": {
-        "php": "^8.5"
+        "php": "^8.5",
+        "ez-php/console": "^2.0",
+        "ez-php/contracts": "^2.0",
+        "ez-php/support": "^2.0"
+    },
+    "suggest": {
+        "ext-redis": "Needed for Mutex\\RedisMutex"
     },
     "require-dev": {
         "ez-php/docker": "^2.0",

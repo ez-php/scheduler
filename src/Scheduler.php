@@ -10,7 +10,7 @@ use DateTimeInterface;
  * Class Scheduler
  *
  * Registry of scheduled commands. Service providers call command() to register
- * entries; the application's schedule:run command calls run() each minute.
+ * entries; the `scheduler:run` command (Console\SchedulerRunCommand) calls run() each minute.
  *
  * Usage (in a ServiceProvider boot()):
  *
@@ -94,8 +94,9 @@ final class Scheduler
      * @param DateTimeInterface    $time     The moment to evaluate (typically now).
      * @param callable(string): void $executor Called with the command name for each
      *                                         due entry that is not skipped. In an
-     *                                         ez-php application this would call
-     *                                         Console::call($commandName).
+     *                                         ez-php application SchedulerRunCommand
+     *                                         supplies one that runs the command
+     *                                         through the application Console.
      *
      * @throws SchedulerException When withoutOverlapping() is used but no
      *                            MutexInterface was configured.
