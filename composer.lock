@@ -675,16 +675,16 @@
         },
         {
             "name": "ez-php/framework",
-            "version": "2.5.0",
+            "version": "2.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ez-php/framework.git",
-                "reference": "05b38fcadc4a95ecb972e45f6e34b00df807cfdd"
+                "reference": "34c5500e167123e1d7d8f0119db0906ad03dd59b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ez-php/framework/zipball/05b38fcadc4a95ecb972e45f6e34b00df807cfdd",
-                "reference": "05b38fcadc4a95ecb972e45f6e34b00df807cfdd",
+                "url": "https://api.github.com/repos/ez-php/framework/zipball/34c5500e167123e1d7d8f0119db0906ad03dd59b",
+                "reference": "34c5500e167123e1d7d8f0119db0906ad03dd59b",
                 "shasum": ""
             },
             "require": {
@@ -736,7 +736,7 @@
                 "issues": "https://github.com/ez-php/framework/issues",
                 "source": "https://github.com/ez-php/framework"
             },
-            "time": "2026-09-20T02:42:15+00:00"
+            "time": "2026-09-25T18:54:04+00:00"
         },
         {
             "name": "ez-php/http",
