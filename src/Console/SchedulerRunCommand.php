@@ -40,12 +40,14 @@ final class SchedulerRunCommand implements CommandInterface
     /**
      * SchedulerRunCommand Constructor
      *
-     * @param Scheduler          $scheduler The application's configured Scheduler.
-     * @param ContainerInterface $container Used to resolve the Console at run time.
+     * @param Scheduler          $scheduler   The application's configured Scheduler.
+     * @param ContainerInterface $container   Used to resolve the Console at run time.
+     * @param resource|null      $errorStream Where a failed run is reported; null = STDERR.
      */
     public function __construct(
         private readonly Scheduler $scheduler,
         private readonly ContainerInterface $container,
+        private readonly mixed $errorStream = null,
     ) {
     }
 
@@ -106,7 +108,7 @@ final class SchedulerRunCommand implements CommandInterface
                 }
             });
         } catch (Throwable $e) {
-            Output::error($e->getMessage());
+            Output::error($e->getMessage(), $this->errorStream);
 
             return 1;
         }

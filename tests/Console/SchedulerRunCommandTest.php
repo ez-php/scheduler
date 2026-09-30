@@ -73,6 +73,33 @@ final class SchedulerRunCommandTest extends ApplicationTestCase
         return [$exit, $output];
     }
 
+    /**
+     * Run scheduler:run with its error output — and the inner Console's
+     * "Unknown command" line — captured instead of written to STDERR.
+     *
+     * @param list<\EzPhp\Console\CommandInterface> $innerCommands Commands the scheduled entries run through.
+     *
+     * @return array{int, string} Exit code and the captured error output.
+     */
+    private function runSchedulerRunCapturingErrors(array $innerCommands): array
+    {
+        $errors = fopen('php://memory', 'w+b');
+        self::assertIsResource($errors);
+
+        $this->app()->instance(Console::class, new Console($innerCommands, $errors));
+        $command = new SchedulerRunCommand($this->app()->make(Scheduler::class), $this->app(), $errors);
+
+        ob_start();
+        $exit = $command->handle([]);
+        ob_end_clean();
+
+        rewind($errors);
+        $captured = (string) stream_get_contents($errors);
+        fclose($errors);
+
+        return [$exit, $captured];
+    }
+
     public function testIsNamedDistinctlyFromTheFrameworkScheduleRun(): void
     {
         $command = $this->app()->make(SchedulerRunCommand::class);
@@ -104,9 +131,10 @@ final class SchedulerRunCommandTest extends ApplicationTestCase
     {
         SchedulerProbeProvider::$commands = ['probe:record --fail', 'probe:record after'];
 
-        [$exit] = $this->runSchedulerRun();
+        [$exit, $errors] = $this->runSchedulerRunCapturingErrors([$this->app()->make(SchedulerProbeCommand::class)]);
 
         self::assertSame(1, $exit);
+        self::assertStringContainsString("Scheduled command 'probe:record --fail' exited with code 1.", $errors);
         self::assertSame([['--fail']], SchedulerProbeCommand::$calls);
     }
 
@@ -114,8 +142,9 @@ final class SchedulerRunCommandTest extends ApplicationTestCase
     {
         SchedulerProbeProvider::$commands = ['does:not-exist'];
 
-        [$exit] = $this->runSchedulerRun();
+        [$exit, $errors] = $this->runSchedulerRunCapturingErrors([]);
 
         self::assertSame(1, $exit);
+        self::assertStringContainsString('Unknown command: does:not-exist', $errors);
     }
 }
