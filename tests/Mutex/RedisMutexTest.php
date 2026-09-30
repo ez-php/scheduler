@@ -152,4 +152,27 @@ final class RedisMutexTest extends TestCase
         $this->assertTrue($this->mutex->acquire('key-a'));
         $this->assertFalse($this->mutex->acquire('key-b'));
     }
+
+    public function testLateReleaseDoesNotDeleteALockTakenSinceByAnotherProcess(): void
+    {
+        $this->assertTrue($this->mutex->acquire('overrun'));
+
+        // Simulates: the TTL ran out mid-run and another cron process took the lock.
+        $this->redis->del(RedisMutex::KEY_PREFIX . 'overrun');
+        $other = new RedisMutex($this->redis);
+        $this->assertTrue($other->acquire('overrun'));
+
+        $this->mutex->release('overrun');
+
+        $this->assertFalse((new RedisMutex($this->redis))->acquire('overrun'));
+    }
+
+    public function testReleaseFromAnInstanceThatDidNotAcquireIsANoOp(): void
+    {
+        $this->assertTrue($this->mutex->acquire('held'));
+
+        (new RedisMutex($this->redis))->release('held');
+
+        $this->assertFalse((new RedisMutex($this->redis))->acquire('held'));
+    }
 }

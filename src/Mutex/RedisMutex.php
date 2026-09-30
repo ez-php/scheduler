@@ -24,6 +24,12 @@ use RuntimeException;
  * Every lock carries a TTL, so a process that dies without releasing does not
  * block the schedule forever — Redis expires the key on its own.
  *
+ * The stored value is a random owner token, remembered per key by this
+ * instance. release() deletes the key only while it still holds that token
+ * (compare-and-delete in one Lua script): a run that overruns its TTL can't
+ * delete the lock another process has taken since, and releasing a key this
+ * instance never acquired is a no-op.
+ *
  * Requires the PHP `ext-redis` extension.
  *
  * @package EzPhp\Scheduler\Mutex
@@ -40,6 +46,20 @@ final class RedisMutex implements MutexInterface
      * in a shared Redis database.
      */
     public const string KEY_PREFIX = 'ez-php:scheduler:lock:';
+
+    private const string RELEASE_SCRIPT = <<<'LUA'
+        if redis.call('GET', KEYS[1]) == ARGV[1] then
+            return redis.call('DEL', KEYS[1])
+        end
+        return 0
+        LUA;
+
+    /**
+     * Owner tokens of the locks this instance acquired and has not released, by key.
+     *
+     * @var array<string, string>
+     */
+    private array $tokens = [];
 
     /**
      * RedisMutex Constructor
@@ -76,19 +96,27 @@ final class RedisMutex implements MutexInterface
      */
     public function acquire(string $key): bool
     {
+        $token = bin2hex(random_bytes(16));
+
         try {
-            return $this->redis->set(
+            $acquired = $this->redis->set(
                 self::KEY_PREFIX . $key,
-                (string) time(),
+                $token,
                 ['NX', 'EX' => $this->ttlSeconds],
             ) !== false;
         } catch (RedisException) {
             return false;
         }
+
+        if ($acquired) {
+            $this->tokens[$key] = $token;
+        }
+
+        return $acquired;
     }
 
     /**
-     * Release the lock by deleting the key.
+     * Release the lock if it still carries this instance's token.
      *
      * @param string $key The same key passed to acquire().
      *
@@ -96,8 +124,16 @@ final class RedisMutex implements MutexInterface
      */
     public function release(string $key): void
     {
+        $token = $this->tokens[$key] ?? null;
+
+        if ($token === null) {
+            return;
+        }
+
+        unset($this->tokens[$key]);
+
         try {
-            $this->redis->del(self::KEY_PREFIX . $key);
+            $this->redis->eval(self::RELEASE_SCRIPT, [self::KEY_PREFIX . $key, $token], 1);
         } catch (RedisException) {
             // The lock's TTL will expire it; a failed release is not fatal.
         }

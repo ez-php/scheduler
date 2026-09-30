@@ -223,6 +223,9 @@ $scheduler = new Scheduler($mutex);
 
 - Uses a single atomic `SET key value NX EX ttl`, so there is no read-then-write
   race between concurrent cron processes.
+- The value is a random owner token: `release()` deletes the key only while it
+  still holds this instance's token (Lua compare-and-delete), so a run that
+  overruns its TTL can't remove a lock another process has taken since.
 - Locks carry a TTL, so a crashed process does not block the schedule forever.
   **Pick a TTL longer than the command's worst-case runtime.**
 - Keys are namespaced with `ez-php:scheduler:lock:` so they cannot collide with
@@ -284,21 +287,44 @@ Implement this interface to add custom mutex backends (e.g. Redis, Memcached).
 ```php
 use EzPhp\Scheduler\MutexInterface;
 
-final class RedisMutex implements MutexInterface
+final class MemcachedMutex implements MutexInterface
 {
-    public function __construct(private readonly \Redis $redis) {}
+    /** @var array<string, string> owner token per acquired key */
+    private array $tokens = [];
+
+    public function __construct(private readonly \Memcached $memcached) {}
 
     public function acquire(string $key): bool
     {
-        return (bool) $this->redis->set($key, 1, ['NX', 'EX' => 300]);
+        $token = bin2hex(random_bytes(16));
+
+        if (!$this->memcached->add($key, $token, 300)) {
+            return false;
+        }
+
+        $this->tokens[$key] = $token;
+
+        return true;
     }
 
     public function release(string $key): void
     {
-        $this->redis->del($key);
+        $token = $this->tokens[$key] ?? null;
+        unset($this->tokens[$key]);
+
+        $item = $this->memcached->get($key, null, \Memcached::GET_EXTENDED);
+
+        // Only delete the lock if it is still ours — after a TTL overrun another
+        // process may hold it. cas() with a negative expiry expires it atomically.
+        if ($token !== null && is_array($item) && $item['value'] === $token) {
+            $this->memcached->cas($item['cas'], $key, $token, -1);
+        }
     }
 }
 ```
+
+Store an owner token and release only while the lock still carries it — a plain delete
+lets a run that overran its TTL remove a lock another process has taken since.
 
 ---
 
