@@ -1,6 +1,6 @@
 {
     "name": "ez-php/scheduler",
-    "version": "2.5.8",
+    "version": "2.5.9",
     "description": "Cron-based job scheduler with mutex-backed overlap prevention for ez-php applications",
     "type": "library",
     "license": "MIT",
