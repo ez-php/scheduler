@@ -235,6 +235,24 @@ $scheduler = new Scheduler($mutex);
   twice is the outcome this class exists to prevent.
 - Requires `ext-redis`; the constructor throws `RuntimeException` without it.
 
+### CacheMutex
+
+Overlap prevention on the locks of an `ez-php/cache` store the application already
+runs — Redis, Memcached, Database (owner-token locks shared across hosts) or File.
+Requires `ez-php/cache` (`composer require ez-php/cache`).
+
+```php
+use EzPhp\Scheduler\Mutex\CacheMutex;
+
+$mutex = new CacheMutex($app->make(\EzPhp\Cache\CacheInterface::class), 600); // TTL (default 3600)
+$scheduler = new Scheduler($mutex);
+```
+
+- `release()` goes through the lock object `acquire()` obtained, so it never deletes a
+  lock another process has taken after this run's TTL expired.
+- Keys are namespaced with `ez-php:scheduler:lock:`.
+- Don't use `ArrayDriver` outside tests — its locks are per process.
+
 ---
 
 ## API Reference

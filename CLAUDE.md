@@ -282,7 +282,8 @@ src/
     ├── FileMutex.php               — flock()-based mutex; lock files stored in a configurable directory
     ├── DatabaseMutex.php           — PDO INSERT/DELETE-based mutex; auto-creates scheduler_locks table
     ├── DatabaseMutexWithExpiry.php — as above plus a TTL; reclaims expired locks; auto-creates scheduler_locks_ttl
-    └── RedisMutex.php              — atomic SET NX EX lock with owner token; compare-and-delete release; multi-host; requires ext-redis
+    ├── RedisMutex.php              — atomic SET NX EX lock with owner token; compare-and-delete release; multi-host; requires ext-redis
+    └── CacheMutex.php              — adapter onto ez-php/cache's LockInterface (Redis/Memcached/Database/File cache locks); soft dependency
 
 tests/
 ├── TestCase.php                — base PHPUnit test case
@@ -297,7 +298,8 @@ tests/
     ├── FileMutexTest.php       — covers FileMutex: acquire, release, double-lock, directory creation
     ├── DatabaseMutexTest.php   — covers DatabaseMutex: acquire, release, duplicate key, table creation (SQLite)
     ├── DatabaseMutexWithExpiryTest.php — covers TTL reclaim, key isolation, table separation (SQLite)
-    └── RedisMutexTest.php       — covers acquire/release, cross-instance locking, key prefix, TTL, owner-only release (live Redis; skipped if absent)
+    ├── RedisMutexTest.php       — covers acquire/release, cross-instance locking, key prefix, TTL, owner-only release (live Redis; skipped if absent)
+    └── CacheMutexTest.php       — CacheMutex on ArrayDriver (shared lock registry = two processes) and FileDriver: exclusivity, release, stale-holder release, key prefix
 ```
 
 ---
@@ -348,8 +350,15 @@ Uses a `scheduler_locks` table (created via `CREATE TABLE IF NOT EXISTS` on cons
 
 ---
 
+### CacheMutex (`src/Mutex/CacheMutex.php`)
+
+Adapts `ez-php/cache`'s `CacheInterface::lock()` to `MutexInterface`, so overlap prevention runs on whatever cache store the application already uses — Redis, Memcached and Database locks (owner tokens, shared across hosts) or File (`flock()`, one host). `acquire()` keeps the returned `LockInterface` per key; `release()` releases through it, so release is owner-only wherever the cache lock is, and a key this instance never acquired is a no-op. Keys are prefixed with `KEY_PREFIX`; every lock carries `$ttlSeconds` (default 3600).
+
+---
+
 ## Design Decisions and Constraints
 
+- **`CacheMutex` is an adapter, the dedicated mutexes stay** — mirrors `ez-php/queue`'s `Lock/CacheJobLock`: `ez-php/cache` is a soft dependency (`require-dev` + `suggest`), so the class is only autoloaded when referenced and the package stays installable without it. It brings Memcached- and Database-backed overlap prevention with owner tokens for free; `FileMutex`/`DatabaseMutex*`/`RedisMutex` are unchanged for applications without `ez-php/cache`.
 - **No framework dependency** — `ez-php/scheduler` requires `ez-php/console` (for `SchedulerRunCommand`) and `ez-php/contracts` (for `ContainerInterface`), never `ez-php/framework`. It accepts a plain `PDO` instance for `DatabaseMutex`. `Scheduler` itself still only takes an executor callable, so it runs outside an ez-php application too.
 - **Callable executor in `run()`** — Rather than injecting a `Console` instance, `run()` accepts `callable(string): void`. This keeps the scheduler standalone and testable with a simple closure.
 - **`MutexInterface` throws `SchedulerException` on misconfiguration, not on lock fail** — A missing mutex when `withoutOverlapping()` is requested is a programmer error (fail-fast). A failed lock acquire is a normal runtime event (silent skip).
@@ -376,7 +385,7 @@ Uses a `scheduler_locks` table (created via `CREATE TABLE IF NOT EXISTS` on cons
 
 ## Testing Approach
 
-- **No external infrastructure** — All tests run in-process. `DatabaseMutexTest` and `DatabaseMutexWithExpiryTest` use an in-memory SQLite PDO. `FileMutexTest` uses temp directories cleaned in `tearDown()`.
+- **No external infrastructure except Redis for `RedisMutexTest`** — every other test runs in-process (see the next bullet for Redis). `CacheMutexTest` uses `ez-php/cache`'s `ArrayDriver`/`FileDriver` (`require-dev`) and resets `ArrayLock` around each test. `DatabaseMutexTest` and `DatabaseMutexWithExpiryTest` use an in-memory SQLite PDO. `FileMutexTest` uses temp directories cleaned in `tearDown()`.
 - **`RedisMutexTest` needs a live Redis** — Available via the root Docker Compose stack (`ez-php-redis`); it reads `REDIS_HOST`/`REDIS_PORT` and `markTestSkipped()`s when `ext-redis` is missing or the server is unreachable, so the module still tests green standalone. It uses Redis database **3**, since `ez-php/rate-limiter`'s tests use database 2. Standalone, the module's own `docker-compose.yml` runs a `redis` service (host port `6386`, `REDIS_HOST_PORT`), and CI runs a `redis` service container with `REDIS_HOST=127.0.0.1`, so the test also runs outside the monorepo.
 - **Expiry is tested via TTL, not `sleep()`** — `DatabaseMutexWithExpiryTest` constructs the mutex with a TTL of `0` (or negative) so the lock is already reclaimable the moment it is written. This exercises the crash-recovery path with no clock abstraction and no slow test.
 - **`FileMutexTest::testAcquireReturnsFalseWhenAlreadyLocked`** — Two `FileMutex` instances on the same `lockDir` and same key simulate two concurrent processes. PHP's `flock(LOCK_EX|LOCK_NB)` on a second file handle to the same path correctly returns false when the first holds the lock.
@@ -391,6 +400,6 @@ Uses a `scheduler_locks` table (created via `CREATE TABLE IF NOT EXISTS` on cons
 |---------|-----------------|
 | The framework's `schedule:run` / its `Console\Schedule\Scheduler` | `ez-php/framework` (separate, mutex-less scheduler; this package ships `scheduler:run` instead) |
 | Periodic/background purge of expired lock rows | Application layer — `DatabaseMutexWithExpiry` reclaims lazily per key on acquire; a global sweep of dead keys is a maintenance job |
-| Lock ownership tokens for `DatabaseMutexWithExpiry` | Not implemented — its `release()` deletes the row unconditionally, so a run that overruns `expires_at` can delete a row another process has since reclaimed; `RedisMutex` has owner tokens |
+| Lock ownership tokens for `DatabaseMutexWithExpiry` | Not implemented — its `release()` deletes the row unconditionally, so a run that overruns `expires_at` can delete a row another process has since reclaimed; `RedisMutex` and `CacheMutex` (on `ez-php/cache`'s `DatabaseDriver`, too) have owner tokens |
 | Distributed locking beyond single-DB or single-FS scope | Application-level concern |
 | Job queuing / background processing | `ez-php/queue` |
