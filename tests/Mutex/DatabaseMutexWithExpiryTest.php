@@ -158,4 +158,43 @@ final class DatabaseMutexWithExpiryTest extends TestCase
         $this->assertTrue($mutex->acquire('key'));
         $this->assertTrue($mutex->acquire('key'));
     }
+
+    public function testLateReleaseDoesNotDeleteALockReclaimedByAnotherProcess(): void
+    {
+        // TTL 0: the first holder's lock is reclaimable at once, as after an overrun.
+        $first = new DatabaseMutexWithExpiry($this->pdo, 0);
+        $second = new DatabaseMutexWithExpiry($this->pdo, 3600);
+
+        $this->assertTrue($first->acquire('job'));
+        $this->assertTrue($second->acquire('job'));
+
+        $first->release('job');
+
+        $this->assertFalse((new DatabaseMutexWithExpiry($this->pdo, 3600))->acquire('job'));
+
+        $second->release('job');
+        $this->assertTrue((new DatabaseMutexWithExpiry($this->pdo, 3600))->acquire('job'));
+    }
+
+    public function testReleaseOfAKeyThisInstanceNeverAcquiredLeavesTheLock(): void
+    {
+        $holder = new DatabaseMutexWithExpiry($this->pdo, 3600);
+        $this->assertTrue($holder->acquire('job'));
+
+        (new DatabaseMutexWithExpiry($this->pdo, 3600))->release('job');
+
+        $this->assertFalse((new DatabaseMutexWithExpiry($this->pdo, 3600))->acquire('job'));
+    }
+
+    public function testTableWithoutOwnerColumnIsUpgradedInPlace(): void
+    {
+        $this->pdo->exec('CREATE TABLE scheduler_locks_ttl (lock_key VARCHAR(255) NOT NULL, expires_at INTEGER NOT NULL, PRIMARY KEY (lock_key))');
+        $this->pdo->exec("INSERT INTO scheduler_locks_ttl (lock_key, expires_at) VALUES ('old', 0)");
+
+        $mutex = new DatabaseMutexWithExpiry($this->pdo, 3600);
+
+        $this->assertTrue($mutex->acquire('old')); // the pre-upgrade row had expired and is reclaimed
+        $mutex->release('old');
+        $this->assertTrue($mutex->acquire('old'));
+    }
 }

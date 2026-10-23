@@ -204,6 +204,10 @@ $scheduler = new Scheduler($mutex);
   first is still working, which defeats overlap prevention entirely.
 - Expired rows are reclaimed lazily, per key, on the next acquire. There is no
   background sweep — keys that stop being scheduled keep their last row.
+- Each lock row carries a random owner token: `release()` deletes it only while
+  it still holds this instance's token, so a run that overruns its TTL can't
+  remove a lock another process has reclaimed since. A table created by an older
+  version gets its `owner` column added automatically.
 
 ### RedisMutex
 
