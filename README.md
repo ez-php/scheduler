@@ -108,7 +108,8 @@ $scheduler->command('sync:external')->cron('*/15 * * * *'); // every 15 minutes
 
 Supported field syntax per position: `*` (any), `N` (exact value), `A-B`
 (inclusive range), `*/N` (every N steps starting from 0), `A-B/N` (every N steps
-from A up to B) and comma-separated lists of those (`1,15,30`, `1-5,10`):
+from A up to B) and comma-separated lists of those (`1,15,30`, `1-5,10`).
+Day-of-week counts Sunday as `0` or `7`, as standard cron does (`0 9 * * 5-7` = Fri–Sun):
 
 ```php
 $scheduler->command('reports:hourly')->cron('0 8-18/2 * * 1-5'); // every 2 hours 08–18, Mon–Fri
