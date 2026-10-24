@@ -101,4 +101,17 @@ final class DatabaseMutexTest extends TestCase
         $mutex = new DatabaseMutex($this->pdo);
         $this->assertTrue($mutex->acquire('idempotent-key'));
     }
+
+    public function testIsLockedReadsWithoutAcquiring(): void
+    {
+        $mutex = new DatabaseMutex($this->pdo);
+        $this->assertFalse($mutex->isLocked('job'));
+
+        $mutex->acquire('job');
+        $this->assertTrue($mutex->isLocked('job'));
+        $this->assertTrue($mutex->isLocked('job'), 'checking twice does not take the lock');
+
+        $mutex->release('job');
+        $this->assertFalse($mutex->isLocked('job'));
+    }
 }

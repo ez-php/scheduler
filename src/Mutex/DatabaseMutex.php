@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace EzPhp\Scheduler\Mutex;
 
-use EzPhp\Scheduler\MutexInterface;
+use EzPhp\Scheduler\InspectableMutexInterface;
 use PDO;
 use PDOException;
 
@@ -23,7 +23,7 @@ use PDOException;
  *
  * @package EzPhp\Scheduler\Mutex
  */
-final class DatabaseMutex implements MutexInterface
+final class DatabaseMutex implements InspectableMutexInterface
 {
     /**
      * @param PDO $pdo Database connection. The calling code is responsible for
@@ -70,5 +70,16 @@ final class DatabaseMutex implements MutexInterface
     {
         $stmt = $this->pdo->prepare('DELETE FROM scheduler_locks WHERE lock_key = ?');
         $stmt->execute([$key]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isLocked(string $key): bool
+    {
+        $stmt = $this->pdo->prepare('SELECT 1 FROM scheduler_locks WHERE lock_key = ?');
+        $stmt->execute([$key]);
+
+        return $stmt->fetchColumn() !== false;
     }
 }

@@ -14,28 +14,40 @@ composer require ez-php/scheduler
 
 ## Quick Start
 
-Bind a configured `Scheduler` in a service provider's `register()`:
+Register `SchedulerServiceProvider` (in an ez-php application: uncomment it in
+`provider/modules.php`). It binds one shared `Scheduler` with the mutex chosen by
+`config/scheduler.php` and registers `scheduler:run` and `scheduler:list`:
 
 ```php
-use EzPhp\Scheduler\Mutex\FileMutex;
+// config/scheduler.php
+return [
+    'mutex' => 'file',   // file | database | database_expiry | redis | cache | none
+    'ttl' => 3600,       // database_expiry, redis, cache
+    'file' => ['path' => sys_get_temp_dir() . '/ez-scheduler-locks'],
+    'redis' => ['host' => '127.0.0.1', 'port' => 6379, 'database' => 0],
+];
+```
+
+`database`/`database_expiry` use the bound `DatabaseInterface`'s PDO, `cache` the bound
+`ez-php/cache` `CacheInterface`. Entries stay application code — add them in the
+`boot()` of a provider registered after `SchedulerServiceProvider`:
+
+```php
 use EzPhp\Scheduler\Scheduler;
 
-$this->app->bind(Scheduler::class, function (): Scheduler {
-    $scheduler = new Scheduler(new FileMutex(sys_get_temp_dir() . '/ez-schedule-locks'));
+public function boot(): void
+{
+    $scheduler = $this->app->make(Scheduler::class); // shared instance
 
     $scheduler->command('queue:work --max-jobs=100')->everyMinute()->withoutOverlapping();
     $scheduler->command('cache:prune')->hourly();
     $scheduler->command('reports:generate')->daily();
-
-    return $scheduler;
-});
+}
 ```
 
-Register the `scheduler:run` command before bootstrap (e.g. in `public/index.php` and `ez`):
-
-```php
-$app->registerCommand(\EzPhp\Scheduler\Console\SchedulerRunCommand::class);
-```
+Without the provider, bind a `Scheduler` yourself and register the commands before
+bootstrap (`$app->registerCommand(SchedulerRunCommand::class)`, likewise
+`SchedulerListCommand`).
 
 Run it from a cron entry, once per minute:
 
@@ -51,6 +63,12 @@ the first entry that fails (non-zero exit or exception) and exits `1`.
 It is deliberately named `scheduler:run`: the framework's own `schedule:run` drives the
 framework's simpler `EzPhp\Console\Schedule\Scheduler` (no overlap prevention, no
 `cron()`), not this package's. Use one or the other, not both from cron.
+
+`scheduler:list` prints every entry with its frequency, overlap setting, the next due
+minute (searched up to 31 days ahead) and the lock state. The lock is read without
+being acquired, so listing never makes a running `scheduler:run` skip an entry; this
+needs a mutex implementing `InspectableMutexInterface` (`RedisMutex`, `DatabaseMutex`,
+`DatabaseMutexWithExpiry`) — `FileMutex` and `CacheMutex` show `unknown`.
 
 Outside an ez-php application, call `run()` with your own executor:
 
@@ -88,10 +106,15 @@ $scheduler->command('reports:weekly')->cron('30 6 * * 1'); // 06:30 every Monday
 $scheduler->command('sync:external')->cron('*/15 * * * *'); // every 15 minutes
 ```
 
-Supported field syntax per position: `*` (any), `N` (exact value), `*/N` (every
-N steps starting from 0). Ranges (`1-5`) and lists (`1,3,5`) are not supported —
-compose several `command()` calls, or use one of the predefined frequency
-methods, if you need those. A malformed expression (not exactly five
+Supported field syntax per position: `*` (any), `N` (exact value), `A-B`
+(inclusive range), `*/N` (every N steps starting from 0), `A-B/N` (every N steps
+from A up to B) and comma-separated lists of those (`1,15,30`, `1-5,10`):
+
+```php
+$scheduler->command('reports:hourly')->cron('0 8-18/2 * * 1-5'); // every 2 hours 08–18, Mon–Fri
+```
+
+Names (`MON`), macros (`@daily`) and `L`/`W`/`#` are not supported. A malformed expression (not exactly five
 space-separated fields) is simply never due, same as an entry with no
 frequency set at all.
 
@@ -273,6 +296,7 @@ new Scheduler(?MutexInterface $mutex = null)
 | `all(): list<ScheduleEntry>` | Return all registered entries |
 | `dueEntries(DateTimeInterface $time): list<ScheduleEntry>` | Return entries whose predicate matches `$time` |
 | `run(DateTimeInterface $time, callable $executor): void` | Execute all due entries via the callable |
+| `isLocked(ScheduleEntry $entry): ?bool` | Read-only lock state; `null` without `withoutOverlapping()` or an `InspectableMutexInterface` mutex |
 
 ### `ScheduleEntry`
 
@@ -289,6 +313,7 @@ new Scheduler(?MutexInterface $mutex = null)
 | `isDue(DateTimeInterface $time): bool` | Evaluate the frequency predicate |
 | `getCommand(): string` | Return the registered command name |
 | `getMutexKey(): string` | Return a stable `sha1`-derived lock key |
+| `nextRunAfter(DateTimeInterface $after, int $maxMinutes = 44640): ?DateTimeImmutable` | Next due minute within the window (default 31 days), or `null` |
 
 ### `MutexInterface`
 
@@ -301,6 +326,9 @@ interface MutexInterface
 ```
 
 Implement this interface to add custom mutex backends (e.g. Redis, Memcached).
+Implement `InspectableMutexInterface` (adds `isLocked(string $key): bool`) as well when
+the backend can report a held lock without acquiring it — `scheduler:list` then shows
+the lock state.
 
 ---
 

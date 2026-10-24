@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use DateTimeImmutable;
+use EzPhp\Scheduler\InspectableMutexInterface;
 use EzPhp\Scheduler\MutexInterface;
 use EzPhp\Scheduler\ScheduleEntry;
 use EzPhp\Scheduler\Scheduler;
@@ -291,5 +292,53 @@ final class SchedulerTest extends TestCase
         }
 
         $this->assertSame([$entry->getMutexKey()], $mutex->released, 'Lock must be released even on exception');
+    }
+
+    public function testIsLockedIsNullWithoutOverlapOrInspectableMutex(): void
+    {
+        $plain = new Scheduler();
+        $entry = $plain->command('a')->everyMinute()->withoutOverlapping();
+        $this->assertNull($plain->isLocked($entry), 'no mutex');
+
+        $opaque = new Scheduler(new class () implements MutexInterface {
+            public function acquire(string $key): bool
+            {
+                return true;
+            }
+
+            public function release(string $key): void
+            {
+            }
+        });
+        $this->assertNull($opaque->isLocked($opaque->command('b')->everyMinute()->withoutOverlapping()));
+    }
+
+    public function testIsLockedAsksAnInspectableMutex(): void
+    {
+        $mutex = new class () implements InspectableMutexInterface {
+            /** @var list<string> */
+            public array $held = [];
+
+            public function acquire(string $key): bool
+            {
+                return true;
+            }
+
+            public function release(string $key): void
+            {
+            }
+
+            public function isLocked(string $key): bool
+            {
+                return in_array($key, $this->held, true);
+            }
+        };
+        $scheduler = new Scheduler($mutex);
+        $overlapping = $scheduler->command('a')->everyMinute()->withoutOverlapping();
+        $free = $scheduler->command('b')->everyMinute();
+        $mutex->held[] = $overlapping->getMutexKey();
+
+        $this->assertTrue($scheduler->isLocked($overlapping));
+        $this->assertNull($scheduler->isLocked($free));
     }
 }

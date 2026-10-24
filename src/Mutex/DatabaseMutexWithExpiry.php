@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace EzPhp\Scheduler\Mutex;
 
-use EzPhp\Scheduler\MutexInterface;
+use EzPhp\Scheduler\InspectableMutexInterface;
 use PDO;
 use PDOException;
 
@@ -35,7 +35,7 @@ use PDOException;
  *
  * @package EzPhp\Scheduler\Mutex
  */
-final class DatabaseMutexWithExpiry implements MutexInterface
+final class DatabaseMutexWithExpiry implements InspectableMutexInterface
 {
     /**
      * Default lock lifetime in seconds (one hour).
@@ -145,6 +145,19 @@ final class DatabaseMutexWithExpiry implements MutexInterface
 
         $stmt = $this->pdo->prepare('DELETE FROM ' . self::TABLE . ' WHERE lock_key = ? AND owner = ?');
         $stmt->execute([$key, $token]);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * An expired row counts as free — the next acquire() reclaims it.
+     */
+    public function isLocked(string $key): bool
+    {
+        $stmt = $this->pdo->prepare('SELECT 1 FROM ' . self::TABLE . ' WHERE lock_key = ? AND expires_at > ?');
+        $stmt->execute([$key, time()]);
+
+        return $stmt->fetchColumn() !== false;
     }
 
     /**

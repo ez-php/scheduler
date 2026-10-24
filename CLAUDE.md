@@ -265,7 +265,7 @@ When adding a new module, add `"$ROOT/modules/<name>"` to the `PACKAGES` array i
 
 # Package: ez-php/scheduler
 
-Cron-based job scheduler for ez-php applications — frequency-based entry registration, mutex-backed overlap prevention, and a pluggable driver architecture (File, Database).
+Cron-based job scheduler for ez-php applications — frequency-based entry registration, mutex-backed overlap prevention, a pluggable driver architecture (File, Database, DatabaseWithExpiry, Redis, Cache), a service provider and `scheduler:run` / `scheduler:list` commands.
 
 ---
 
@@ -275,10 +275,13 @@ Cron-based job scheduler for ez-php applications — frequency-based entry regis
 src/
 ├── SchedulerException.php      — base exception for all scheduler errors
 ├── MutexInterface.php          — contract: acquire(key): bool, release(key): void
-├── ScheduleEntry.php           — fluent builder: frequency methods + withoutOverlapping()
-├── Scheduler.php               — registry + dueEntries() + run(callable $executor)
+├── InspectableMutexInterface.php — optional extension: isLocked(key): bool, read-only (Redis/Database/DatabaseWithExpiry)
+├── SchedulerServiceProvider.php — binds a shared Scheduler with the scheduler.mutex driver; registers scheduler:run / scheduler:list
+├── ScheduleEntry.php           — fluent builder: frequency methods + withoutOverlapping(); nextRunAfter()
+├── Scheduler.php               — registry + dueEntries() + run(callable $executor) + isLocked(entry)
 ├── Console/
-│   └── SchedulerRunCommand.php — `scheduler:run`: runs due entries through the application Console (opt-in via registerCommand)
+│   ├── SchedulerRunCommand.php — `scheduler:run`: runs due entries through the application Console
+│   └── SchedulerListCommand.php — `scheduler:list`: entries, frequency, overlap flag, next run (≤ 31 days), lock state
 └── Mutex/
     ├── FileMutex.php               — flock()-based mutex; lock files stored in a configurable directory
     ├── DatabaseMutex.php           — PDO INSERT/DELETE-based mutex; auto-creates scheduler_locks table
@@ -289,10 +292,12 @@ src/
 tests/
 ├── TestCase.php                — base PHPUnit test case
 ├── Integration/MutexConcurrencyTest.php  — Integration tests for Scheduler mutex behaviour under concurrent workers
-├── ScheduleEntryTest.php       — covers ScheduleEntry: all frequency methods, withoutOverlapping, mutex key
-├── SchedulerTest.php           — covers Scheduler: registration, dueEntries, run, mutex acquire/release/skip
+├── ScheduleEntryTest.php       — covers ScheduleEntry: all frequency methods, withoutOverlapping, mutex key, nextRunAfter
+├── SchedulerTest.php           — covers Scheduler: registration, dueEntries, run, mutex acquire/release/skip, isLocked
+├── SchedulerServiceProviderTest.php — shared instance, each scheduler.mutex driver (file/database/database_expiry/cache/none), unknown driver, command registration
 ├── Console/
-│   └── SchedulerRunCommandTest.php — bootstraps a real Application (SQLite config) and runs `scheduler:run` through its Console
+│   ├── SchedulerRunCommandTest.php — bootstraps a real Application (SQLite config) and runs `scheduler:run` through its Console
+│   └── SchedulerListCommandTest.php — table columns, locked/free/unknown/- lock states, "not within 31 days"
 ├── Support/
 │   ├── SchedulerProbeCommand.php   — console command recording its arguments; `--fail` exits 1
 │   └── SchedulerProbeProvider.php  — binds a Scheduler with everyMinute() entries from a static list
@@ -320,10 +325,11 @@ Fluent builder for a single scheduled job. Holds the command name, a due-predica
 | `daily()` | Due at 00:00 |
 | `weekly()` | Due on Sunday at 00:00 |
 | `monthly()` | Due on the 1st at 00:00 |
-| `cron(string $expression)` | Due when a five-field cron expression (`minute hour dom month dow`; `*`, `N`, `*\/N`) matches |
+| `cron(string $expression)` | Due when a five-field cron expression (`minute hour dom month dow`; `*`, `N`, `A-B`, `*\/N`, `A-B/N`, comma lists) matches |
 | `withoutOverlapping(bool $enabled = true)` | Enables mutex-based skip when already running |
 | `isDue(DateTimeInterface $time)` | Evaluates the predicate against the given time |
 | `getMutexKey()` | Returns a stable `sha1`-derived key for the mutex |
+| `nextRunAfter(DateTimeInterface $after, int $maxMinutes = 44640)` | Next due minute, probing minute by minute (the frequency is a closure); `null` outside the window |
 
 ---
 
@@ -377,9 +383,11 @@ Adapts `ez-php/cache`'s `CacheInterface::lock()` to `MutexInterface`, so overlap
 - **`ext-redis` is not declared in `composer.json`** — Matches `ez-php/rate-limiter`, which also ships a `RedisDriver` without declaring the extension. Availability is checked at construction with `extension_loaded()` and raises `RuntimeException`, keeping the package installable without Redis.
 - **Expiry stored as a Unix timestamp `INTEGER`** — Avoids `DATETIME` dialect differences between MySQL and SQLite and keeps the comparison a plain integer compare.
 - **`ScheduleEntry` is mutable** — Frequency and overlap flags are set after construction via fluent methods (the caller receives the entry from `Scheduler::command()`). Immutability would require a builder pattern for no real benefit.
-- **`cron()` delegates to `ez-php/support`'s `CronExpression`** — `ez-php/queue`'s `Scheduling\ScheduledTask` parses the same five-field subset (`*`, `N`, `*\/N`), and the two used to keep identical, hand-synced private matchers. Both now call `EzPhp\Support\CronExpression::isDue()`: `ez-php/support` has zero dependencies, so neither package takes on the other (or the framework) to share it. Richer cron syntax (ranges, lists) goes there, once, for both. The framework's own `Console\Schedule\ScheduledCommand` has only fixed frequencies (no cron fields) and cannot depend on a module, so it is unaffected.
-- **A malformed `cron()` expression is silently never-due, not an exception** — Consistent with every other frequency method: `isDue()` never throws, it fails closed. A five-field-count check is the only validation; unrecognized field syntax within a field falls through to the exact-match branch, which simply never matches a real calendar value.
-- **Own `scheduler:run` command, not a replacement for `schedule:run`** — The framework's `ScheduleRunCommand` type-hints its own `final EzPhp\Console\Schedule\Scheduler`, so this package's `Scheduler` cannot be swapped in. `SchedulerRunCommand` is therefore this package's own entry point, deliberately named `scheduler:run` so both can be registered without a name clash. It is opt-in (`$app->registerCommand()`), like `ez-php/auth`'s commands; the application binds a configured `Scheduler`.
+- **`cron()` delegates to `ez-php/support`'s `CronExpression`** — `ez-php/queue`'s `Scheduling\ScheduledTask` parses the same five-field subset (`*`, `N`, `A-B`, `*\/N`, `A-B/N`, lists), and the two used to keep identical, hand-synced private matchers. Both now call `EzPhp\Support\CronExpression::isDue()`: `ez-php/support` has zero dependencies, so neither package takes on the other (or the framework) to share it. Richer cron syntax goes there, once, for both (ranges, lists and stepped ranges already did). The framework's own `Console\Schedule\ScheduledCommand` has only fixed frequencies (no cron fields) and cannot depend on a module, so it is unaffected.
+- **A malformed `cron()` expression is silently never-due, not an exception** — Consistent with every other frequency method: `isDue()` never throws, it fails closed. `CronExpression` rejects a wrong field count and any field outside the supported syntax (names, macros, empty list items, reversed ranges, step 0) by never matching.
+- **`SchedulerServiceProvider` binds one shared `Scheduler` but no entries** — entries are application knowledge, so an application provider adds them in `boot()` on the container-cached instance. The mutex comes from `scheduler.mutex` (default `file`, so `withoutOverlapping()` works without further setup); `cache` resolves `ez-php/cache`'s `CacheInterface`, which stays a `suggest`. The file-lock directory is config, not derived from a base path — modules have no base-path contract. The framework builds console commands (and so the `Scheduler` and its mutex) on every `php ez …` call: the database mutexes therefore run their `CREATE TABLE IF NOT EXISTS` each time, and a Redis connect failure is swallowed so an unreachable Redis cannot break unrelated commands — `RedisMutex` then fails closed.
+- **`scheduler:list` reads lock state without acquiring** — an acquire+release probe would be visible to a concurrent `scheduler:run`, whose own `acquire()` could fail in that window and skip the entry. So the lock column needs `InspectableMutexInterface`, a separate optional interface (adding `isLocked()` to `MutexInterface` would break custom mutexes). Redis (`EXISTS`, fails closed = locked), `DatabaseMutex` (`SELECT`) and `DatabaseMutexWithExpiry` (`SELECT … expires_at > now`) implement it; `FileMutex` (`flock()` has no read-only probe) and `CacheMutex` (`LockInterface` has none) show `unknown`. "Next run" probes `isDue()` minute by minute for up to 31 days (44 640 closure calls per entry), since `ScheduleEntry` stores its frequency as a closure.
+- **Own `scheduler:run` command, not a replacement for `schedule:run`** — The framework's `ScheduleRunCommand` type-hints its own `final EzPhp\Console\Schedule\Scheduler`, so this package's `Scheduler` cannot be swapped in. `SchedulerRunCommand` is therefore this package's own entry point, deliberately named `scheduler:run` so both can be registered without a name clash. `SchedulerServiceProvider` registers it (and `scheduler:list`); without the provider it is opt-in via `$app->registerCommand()` and the application binds a configured `Scheduler`.
 - **`SchedulerRunCommand` resolves the Console lazily from `ContainerInterface`** — The framework constructs user commands while building `Console` itself, so injecting `Console` would be a circular dependency. The framework's `ScheduleRunCommand` defers it through a factory closure for the same reason; a closure is not autowirable for a class registered by name, so this command takes the container instead and resolves `Console` only when an entry is due.
 - **First failure stops the run** — `Scheduler::run()` logs and rethrows an executor exception, so later entries in the same tick are skipped. `SchedulerRunCommand` turns a non-zero exit into a `SchedulerException`, prints it and exits `1` so cron/monitoring sees the failure.
 - **`ez-php/queue`'s own scheduler is reconciled by registration, not by code.** `ez-php/queue` ships an independent, job-class-based scheduler (`Scheduling\Scheduler`/`ScheduledTask`, driven by `queue:schedule`) with cron matching but no overlap prevention. Rather than merging the two packages' data models (job-class-based vs. console-command-based — a real merge, out of scope), the documented bridge is to register `queue:schedule` itself as a single `withoutOverlapping()` entry here, so this package's mutex wraps the entire due-job-pushing step as one atomic unit. See README § "Reconciling with `ez-php/queue`'s own scheduler". No code changes to either package; this is pure integration glue, deliberately left undone in source (Test/Doku-scope, per the originating TODO item, was resolved as docs-only).

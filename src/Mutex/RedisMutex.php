@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace EzPhp\Scheduler\Mutex;
 
-use EzPhp\Scheduler\MutexInterface;
+use EzPhp\Scheduler\InspectableMutexInterface;
 use Redis;
 use RedisException;
 use RuntimeException;
@@ -34,7 +34,7 @@ use RuntimeException;
  *
  * @package EzPhp\Scheduler\Mutex
  */
-final class RedisMutex implements MutexInterface
+final class RedisMutex implements InspectableMutexInterface
 {
     /**
      * Default lock lifetime in seconds (one hour).
@@ -136,6 +136,21 @@ final class RedisMutex implements MutexInterface
             $this->redis->eval(self::RELEASE_SCRIPT, [self::KEY_PREFIX . $key, $token], 1);
         } catch (RedisException) {
             // The lock's TTL will expire it; a failed release is not fatal.
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * An unreachable Redis reports the key as locked — the same fail-closed
+     * reading acquire() applies.
+     */
+    public function isLocked(string $key): bool
+    {
+        try {
+            return (int) $this->redis->exists(self::KEY_PREFIX . $key) > 0;
+        } catch (RedisException) {
+            return true;
         }
     }
 }

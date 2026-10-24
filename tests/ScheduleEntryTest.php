@@ -242,4 +242,21 @@ final class ScheduleEntryTest extends TestCase
 
         $this->assertSame($entry, $entry->cron('* * * * *'));
     }
+
+    public function testNextRunAfterFindsTheNextDueMinute(): void
+    {
+        $after = new \DateTimeImmutable('2026-09-27 13:37:42');
+
+        $this->assertSame('2026-09-27 14:00', (new ScheduleEntry('a'))->hourly()->nextRunAfter($after)?->format('Y-m-d H:i'));
+        $this->assertSame('2026-10-01 00:00', (new ScheduleEntry('b'))->monthly()->nextRunAfter($after)?->format('Y-m-d H:i'));
+        $this->assertSame('2026-09-27 13:38', (new ScheduleEntry('c'))->everyMinute()->nextRunAfter($after)?->format('Y-m-d H:i'));
+    }
+
+    public function testNextRunAfterIsNullOutsideTheWindow(): void
+    {
+        $after = new \DateTimeImmutable('2026-09-27 13:37');
+
+        $this->assertNull((new ScheduleEntry('a'))->nextRunAfter($after));
+        $this->assertNull((new ScheduleEntry('b'))->daily()->nextRunAfter($after, 60));
+    }
 }

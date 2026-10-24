@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EzPhp\Scheduler;
 
+use DateTimeImmutable;
 use DateTimeInterface;
 use EzPhp\Support\CronExpression;
 
@@ -128,14 +129,13 @@ final class ScheduleEntry
 
     /**
      * Schedule the command using an explicit five-field cron expression
-     * (minute hour day-of-month month day-of-week). Supported field syntax:
-     * `*`, `N`, `*\/N` — the same subset `ez-php/queue`'s
-     * `Scheduling\ScheduledTask::cron()` parses, reimplemented here rather
-     * than depended on so this package keeps its "no framework dependency"
-     * constraint (see Design Decisions in CLAUDE.md).
+     * (minute hour day-of-month month day-of-week), matched by
+     * `ez-php/support`'s CronExpression — the same matcher `ez-php/queue`'s
+     * `Scheduling\ScheduledTask::cron()` uses. Supported field syntax: `*`,
+     * `N`, `A-B`, `*\/N`, `A-B/N` and comma-separated lists of those.
      *
-     * A malformed expression (not exactly five space-separated fields) is
-     * never due, matching how the other frequency methods fail closed
+     * A malformed expression (not exactly five space-separated fields, or a
+     * field with unsupported syntax) is never due, matching how the other frequency methods fail closed
      * rather than throwing.
      *
      * @param string $expression Cron expression: "minute hour dom month dow".
@@ -242,6 +242,33 @@ final class ScheduleEntry
     public function getMutexKey(): string
     {
         return 'scheduler:' . sha1($this->jobName ?? $this->command);
+    }
+
+    /**
+     * The next minute after $after at which this entry is due, probing minute by
+     * minute up to $maxMinutes ahead (default 31 days, enough for monthly()).
+     * Null when nothing matches in that window. The frequency is stored as a
+     * closure, so there is no closed-form answer.
+     *
+     * @param DateTimeInterface $after      Starting point (exclusive).
+     * @param int               $maxMinutes Search window in minutes.
+     *
+     * @return DateTimeImmutable|null
+     */
+    public function nextRunAfter(DateTimeInterface $after, int $maxMinutes = 44640): ?DateTimeImmutable
+    {
+        $candidate = DateTimeImmutable::createFromInterface($after)
+            ->setTime((int) $after->format('G'), (int) $after->format('i'));
+
+        for ($i = 0; $i < $maxMinutes; $i++) {
+            $candidate = $candidate->modify('+1 minute');
+
+            if ($this->isDue($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
     }
 
     /**

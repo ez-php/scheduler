@@ -175,4 +175,16 @@ final class RedisMutexTest extends TestCase
 
         $this->assertFalse((new RedisMutex($this->redis))->acquire('held'));
     }
+
+    public function testIsLockedReadsWithoutAcquiring(): void
+    {
+        $this->assertFalse($this->mutex->isLocked('job'));
+
+        $this->mutex->acquire('job');
+        $this->assertTrue($this->mutex->isLocked('job'));
+        $this->assertTrue((new RedisMutex($this->redis))->isLocked('job'));
+
+        $this->mutex->release('job');
+        $this->assertFalse($this->mutex->isLocked('job'));
+    }
 }

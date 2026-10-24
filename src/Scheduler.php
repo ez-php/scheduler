@@ -88,6 +88,26 @@ final class Scheduler
     }
 
     /**
+     * Whether the entry's overlap lock is currently held, read without acquiring it.
+     *
+     * Null when the answer is unknown: the entry does not use withoutOverlapping(),
+     * no mutex is configured, or the mutex has no read-only check
+     * (see InspectableMutexInterface).
+     *
+     * @param ScheduleEntry $entry
+     *
+     * @return bool|null
+     */
+    public function isLocked(ScheduleEntry $entry): ?bool
+    {
+        if (!$entry->shouldSkipIfOverlapping() || !$this->mutex instanceof InspectableMutexInterface) {
+            return null;
+        }
+
+        return $this->mutex->isLocked($entry->getMutexKey());
+    }
+
+    /**
      * Run all due entries, respecting mutex locks for entries declared with
      * withoutOverlapping().
      *

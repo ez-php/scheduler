@@ -197,4 +197,19 @@ final class DatabaseMutexWithExpiryTest extends TestCase
         $mutex->release('old');
         $this->assertTrue($mutex->acquire('old'));
     }
+
+    public function testIsLockedReadsWithoutAcquiringAndIgnoresExpiredRows(): void
+    {
+        $mutex = new DatabaseMutexWithExpiry($this->pdo, 60);
+        $this->assertFalse($mutex->isLocked('job'));
+
+        $mutex->acquire('job');
+        $this->assertTrue($mutex->isLocked('job'));
+        $mutex->release('job');
+        $this->assertFalse($mutex->isLocked('job'));
+
+        $expired = new DatabaseMutexWithExpiry($this->pdo, 0);
+        $expired->acquire('stale');
+        $this->assertFalse($expired->isLocked('stale'));
+    }
 }
