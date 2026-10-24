@@ -132,7 +132,8 @@ final class ScheduleEntry
      * (minute hour day-of-month month day-of-week), matched by
      * `ez-php/support`'s CronExpression — the same matcher `ez-php/queue`'s
      * `Scheduling\ScheduledTask::cron()` uses. Supported field syntax: `*`,
-     * `N`, `A-B`, `*\/N`, `A-B/N` and comma-separated lists of those.
+     * `N`, `A-B`, `*\/N`, `A-B/N` and comma-separated lists of those; with both
+     * day-of-month and day-of-week restricted, either matching is enough.
      *
      * A malformed expression (not exactly five space-separated fields, or a
      * field with unsupported syntax) is never due, matching how the other frequency methods fail closed

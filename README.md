@@ -114,6 +114,8 @@ from A up to B) and comma-separated lists of those (`1,15,30`, `1-5,10`):
 $scheduler->command('reports:hourly')->cron('0 8-18/2 * * 1-5'); // every 2 hours 08–18, Mon–Fri
 ```
 
+When both day-of-month and day-of-week are restricted, either one matching is enough (standard cron): `0 9 1,15 * 1-5` runs on the 1st, the 15th and every weekday. If either field starts with `*`, both must match.
+
 Names (`MON`), macros (`@daily`) and `L`/`W`/`#` are not supported. A malformed expression (not exactly five
 space-separated fields) is simply never due, same as an entry with no
 frequency set at all.
